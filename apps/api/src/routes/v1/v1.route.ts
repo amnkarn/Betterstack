@@ -1,9 +1,35 @@
 import { Router } from "express";
+import userRouter from "./user.route";
+import websiteRouter from "./website.route";
+import prismaClient from "@repo/db/client";
+import authMiddleware from "../../middleware/authMiddleware";
 
 const v1Route = Router();
 
-v1Route.get("/", () => {
+v1Route.use("/user", userRouter);
 
+v1Route.use("/website", authMiddleware, websiteRouter)
+
+v1Route.get("/status/:websiteId", authMiddleware, async (req, res) => {
+    const { websiteId } = req.params;
+    if(!websiteId) {
+        return res.status(400).json({ message: "website id is missing" });
+    }
+
+    const userId = req.userId!;
+
+    const website = await prismaClient.website.findFirst({
+        where: {
+            id: (websiteId as string),
+            user_id: userId,
+        }
+    })
+
+    if(!website) {
+        return res.status(400).json({
+            message: "website not found"
+        })
+    }
 })
 
 export default v1Route;
