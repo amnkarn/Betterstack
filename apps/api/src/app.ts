@@ -11,14 +11,3 @@ app.use(moragen("dev"));
 app.use(cors());
 
 app.use("/api", indexRouter);
-
-app.get("/", async (req: Request, res: Response) => {
-    const result = await prismaClient.user.create({
-        data: {
-            username: "asdf",
-            password: "asdf"
-        }
-    })
-
-    res.status(200).json(result);
-})
