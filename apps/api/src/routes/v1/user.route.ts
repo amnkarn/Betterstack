@@ -2,12 +2,13 @@ import prismaClient from "@repo/db/client";
 import { Router } from "express";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
+import { UserInputSchema } from "../../validator";
 
 const userRouter: Router = Router();
 
 userRouter.post("/signup", async (req, res) => {
-    const { username, password } = req.body;
-    if(!username || !password) {
+    const parsedData = UserInputSchema.safeParse(req.body);
+    if(!parsedData.success) {
         return res.status(400).json({
             message: "Required fields are missing"
         })
@@ -16,8 +17,8 @@ userRouter.post("/signup", async (req, res) => {
     try {
         const isAlreadyRegistered = await prismaClient.user.findFirst({
             where: {
-                username,
-                password
+                username: parsedData.data.username,
+                password: parsedData.data.password
             }
         })
 
@@ -29,11 +30,11 @@ userRouter.post("/signup", async (req, res) => {
         }
 
         const salt = await bcrypt.genSalt(5);
-        const hashedPassword = await bcrypt.hash(password, salt);
+        const hashedPassword = await bcrypt.hash(parsedData.data.password, salt);
 
         const user = await prismaClient.user.create({
             data: {
-                username,
+                username: parsedData.data.username,
                 password: hashedPassword
             }
         })
@@ -52,8 +53,8 @@ userRouter.post("/signup", async (req, res) => {
 })
 
 userRouter.post("/signin", async (req, res) => {
-    const { username, password } = req.body;
-    if(!username || !password) {
+    const parsedData = UserInputSchema.safeParse(req.body);
+    if(!parsedData.success) {
         return res.status(400).json({
             message: "Required fields are missing"
         })
@@ -62,7 +63,7 @@ userRouter.post("/signin", async (req, res) => {
     try {
         const user = await prismaClient.user.findFirst({
             where: {
-                username
+                username: parsedData.data.username
             }
         })
         if(!user) {
@@ -71,7 +72,7 @@ userRouter.post("/signin", async (req, res) => {
             })
         }
 
-        const isValid = await bcrypt.compare(password, user.password);
+        const isValid = await bcrypt.compare(parsedData.data.password, user.password);
 
         if(!isValid) {
             return res.status(401).json({
