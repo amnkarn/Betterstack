@@ -9,7 +9,8 @@
   },
   "devDependencies": {
     "@types/bcrypt": "^6.0.0",
-    "@types/bun": "latest"
+    "@types/bun": "latest",
+    "@types/cookie-parser": "^1.4.10"
   },
   "peerDependencies": {
     "typescript": "^5"
@@ -21,6 +22,7 @@
     "@types/jsonwebtoken": "^9.0.10",
     "@types/morgan": "^1.9.10",
     "bcrypt": "^6.0.0",
+    "cookie-parser": "^1.4.7",
     "cors": "^2.8.6",
     "dotenv": "^17.4.2",
     "express": "^5.2.1",

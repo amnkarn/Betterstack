@@ -6,7 +6,7 @@ import { CreateWebsiteInput } from "../../validator";
 
 const websiteRouter: Router = Router();
 
-websiteRouter.post("/", authMiddleware,async (req: Request, res: Response) => {
+websiteRouter.post("/", authMiddleware ,async (req: Request, res: Response) => {
     const parsedData = CreateWebsiteInput.safeParse(req.body);
     if(!parsedData.success) {
         return res.status(400).json({
@@ -14,8 +14,18 @@ websiteRouter.post("/", authMiddleware,async (req: Request, res: Response) => {
         })
     }
     const userId = req.userId!;
-    
+    //console.log(userId);
+
     try {
+        const checkWeb = await prismaClient.website.findFirst({
+            where: { url: parsedData.data.url }
+        })
+        if(checkWeb) {
+            return res.status(400).json({
+                message: "url already exists"
+            })
+        }
+
         const website = await prismaClient.website.create({
             data: {
                 url: parsedData.data.url,

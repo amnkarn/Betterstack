@@ -8,7 +8,7 @@ const v1Route = Router();
 
 v1Route.use("/user", userRouter);
 
-v1Route.use("/website", authMiddleware, websiteRouter)
+v1Route.use("/website", websiteRouter)
 
 v1Route.get("/status/:websiteId", authMiddleware, async (req, res) => {
     const { websiteId } = req.params;
@@ -22,6 +22,14 @@ v1Route.get("/status/:websiteId", authMiddleware, async (req, res) => {
         where: {
             id: (websiteId as string),
             user_id: userId,
+        },
+        include: {
+            ticks: {
+                orderBy: [{
+                    createdAt: "desc"
+                }],
+                take: 1
+            }
         }
     })
 
@@ -30,6 +38,12 @@ v1Route.get("/status/:websiteId", authMiddleware, async (req, res) => {
             message: "website not found"
         })
     }
+
+    res.status(200).json({
+        url: website.url,
+        id: website.id,
+        user_id: website.user_id
+    })
 })
 
 export default v1Route;

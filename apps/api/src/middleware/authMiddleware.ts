@@ -6,6 +6,7 @@ interface JwtPayload {
 }
 
 const authMiddleware = async (req: Request, res: Response, next: NextFunction) => {
+    //console.log("req reached to midd")
     const token = req.cookies.token;
     if(!token) {
         return res.status(400).json({

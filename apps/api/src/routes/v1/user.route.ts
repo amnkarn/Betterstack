@@ -9,7 +9,7 @@ const userRouter: Router = Router();
 userRouter.post("/signup", async (req, res) => {
     const parsedData = UserInputSchema.safeParse(req.body);
     if(!parsedData.success) {
-        return res.status(400).json({
+        return res.status(403).json({
             message: "Required fields are missing"
         })
     }
@@ -18,13 +18,12 @@ userRouter.post("/signup", async (req, res) => {
         const isAlreadyRegistered = await prismaClient.user.findFirst({
             where: {
                 username: parsedData.data.username,
-                password: parsedData.data.password
             }
         })
 
         if(isAlreadyRegistered) {
-            res.status(400).json({
-                message: "User already exists with this email",
+            return res.status(400).json({
+                message: "User already exists with this username",
                 
             })
         }
@@ -55,7 +54,7 @@ userRouter.post("/signup", async (req, res) => {
 userRouter.post("/signin", async (req, res) => {
     const parsedData = UserInputSchema.safeParse(req.body);
     if(!parsedData.success) {
-        return res.status(400).json({
+        return res.status(403).json({
             message: "Required fields are missing"
         })
     }
