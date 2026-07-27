@@ -9,7 +9,7 @@ const websiteRouter: Router = Router();
 websiteRouter.post("/", authMiddleware ,async (req: Request, res: Response) => {
     const parsedData = CreateWebsiteInput.safeParse(req.body);
     if(!parsedData.success) {
-        return res.status(400).json({
+        return res.status(403).json({
             message: "Url is missing"
         })
     }
@@ -34,7 +34,7 @@ websiteRouter.post("/", authMiddleware ,async (req: Request, res: Response) => {
             }
         })
 
-        return res.status(200).json({
+        return res.status(201).json({
             id: website.id
         })
 

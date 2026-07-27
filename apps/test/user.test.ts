@@ -23,7 +23,6 @@ describe("Signup endpoint", () => {
             username: "aman" + Math.floor(Math.random() * 1000),
             password: "password"
         })
-        console.log(res.data.message);
         expect(res.status).toBe(201);
         expect(res.data.userId).toBeDefined();
     })
