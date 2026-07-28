@@ -1,0 +1,17 @@
+{
+  "name": "pusher",
+  "module": "index.ts",
+  "type": "module",
+  "private": true,
+  "dependencies": {
+    "@repo/db": "*",
+    "@repo/redis": "*",
+    "redis": "^6.1.0"
+  },
+  "devDependencies": {
+    "@types/bun": "latest"
+  },
+  "peerDependencies": {
+    "typescript": "^5"
+  }
+}
