@@ -10,17 +10,19 @@ if(!REGION_ID || !WORKER_ID) {
 }
 
 async function main() {
-    while(1) {
+    while(1) { // run infinite loop
+        //read 5 latest data at a time from group
         const res = await xReadGroup(REGION_ID, WORKER_ID);
         if(!res) {
             continue;
         }
         
+        //fetch all the website and create entry in db
         let promises = res.map(({message}) => fetchWebsite(message.url, message.id));
-        await Promise.all(promises);
+        await Promise.all(promises); //wait till fullfill the work
         console.log(promises.length);
 
-        xAckBulk(REGION_ID!, res.map(({id}) => id));
+        xAckBulk(REGION_ID!, res.map(({id}) => id)); //clear from the queue
     }
 }
 
@@ -29,6 +31,7 @@ async function fetchWebsite(url: string, websiteId: string) {
         const startTime = Date.now();
 
         axios.get(url)
+            //if website is fetched easily, then status is 'Up'
             .then(async () => {
                 const endTime = Date.now();
                 await prismaClient.website_tick.create({
@@ -41,6 +44,7 @@ async function fetchWebsite(url: string, websiteId: string) {
                 })
                 resolve();
             })
+            //if website fetch failed, then status is 'Down'
             .catch(async () => {
                 const endTime = Date.now();
                 await prismaClient.website_tick.create({

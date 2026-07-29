@@ -44,6 +44,7 @@ async function xAdd({url, id}: WebsiteEvent) {
 }
 
 export async function xAddBulk(websites: WebsiteEvent[]) {
+    //loop on all website and push into queue
     for(let i = 0; i < websites.length; i++) {
         await xAdd({
             url: (websites[i]?.url as string),
@@ -52,6 +53,7 @@ export async function xAddBulk(websites: WebsiteEvent[]) {
     }
 }
 
+// read 5 data at a time from the group
 export async function xReadGroup(consumerGroup: string, workerId: string): Promise<MessageType[] | undefined> {
     const res = await client.xReadGroup(
         consumerGroup,
@@ -63,8 +65,8 @@ export async function xReadGroup(consumerGroup: string, workerId: string): Promi
             COUNT: 5
         }
     )
-
     //console.log(res);
+    
     //@ts-ignore
     let messages: MessageType[] | undefined = res?.[0]?.messages;
     return messages;
@@ -74,6 +76,7 @@ export async function xAck(consumerGroup: string, eventId: string) {
     const res = await client.xAck(STREAM_NAME, consumerGroup, eventId);
 }
 
+// after completing all jobs(worker) it removes from pending list
 export async function xAckBulk(consumerGroup: string, evenrsId: string[]) {
     evenrsId.map(eventId => xAck(consumerGroup, eventId));
 }
