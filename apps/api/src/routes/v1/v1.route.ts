@@ -28,7 +28,7 @@ v1Route.get("/status/:websiteId", authMiddleware, async (req, res) => {
                 orderBy: [{
                     createdAt: "desc"
                 }],
-                take: 1
+                take: 10, //3 min interval
             }
         }
     })

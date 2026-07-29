@@ -13,7 +13,7 @@ websiteRouter.post("/", authMiddleware ,async (req: Request, res: Response) => {
             message: "Url is missing"
         })
     }
-    const userId = req.userId!;
+    const userId = (req as any).userId;
     //console.log(userId);
 
     try {
