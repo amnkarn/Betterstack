@@ -14,18 +14,27 @@ async function connetReddis() {
         
     }
 }
-
 connetReddis();
 
+//---------------------------------------------
+const STREAM_NAME = "betteruptime:website"
 
 type WebsiteEvent = {
     url: string,
     id: string
 }
 
+type MessageType = {
+    id: string,
+    message: {
+        url: string,
+        id: string
+    }
+}
+
 async function xAdd({url, id}: WebsiteEvent) {
     await client.xAdd(
-        "betteruptim:website",
+        STREAM_NAME,
         "*",
         {
             url,
@@ -43,3 +52,28 @@ export async function xAddBulk(websites: WebsiteEvent[]) {
     }
 }
 
+export async function xReadGroup(consumerGroup: string, workerId: string): Promise<MessageType[] | undefined> {
+    const res = await client.xReadGroup(
+        consumerGroup,
+        workerId,
+        {
+            key: STREAM_NAME,
+            id: ">"
+        }, {
+            COUNT: 5
+        }
+    )
+
+    //console.log(res);
+    //@ts-ignore
+    let messages: MessageType[] | undefined = res?.[0]?.messages;
+    return messages;
+}
+
+export async function xAck(consumerGroup: string, eventId: string) {
+    const res = await client.xAck(STREAM_NAME, consumerGroup, eventId);
+}
+
+export async function xAckBulk(consumerGroup: string, evenrsId: string[]) {
+    evenrsId.map(eventId => xAck(consumerGroup, eventId));
+}

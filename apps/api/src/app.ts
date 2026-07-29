@@ -11,5 +11,7 @@ app.use(express.json());
 app.use(moragen("dev"));
 app.use(cors());
 
-
+app.get("/", (req, res) => {
+    res.send("hello from api")
+})
 app.use("/api", indexRouter);

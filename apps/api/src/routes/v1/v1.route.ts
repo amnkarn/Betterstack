@@ -16,7 +16,7 @@ v1Route.get("/status/:websiteId", authMiddleware, async (req, res) => {
         return res.status(400).json({ message: "website id is missing" });
     }
 
-    const userId = req.userId!;
+    const userId = (req as any).userId!;
 
     const website = await prismaClient.website.findFirst({
         where: {

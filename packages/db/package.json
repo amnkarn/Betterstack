@@ -14,9 +14,10 @@
     "typescript": "^5"
   },
   "dependencies": {
-    "@repo/typescript-config": "*",
     "@prisma/adapter-pg": "^7.9.0",
     "@prisma/client": "^7.9.0",
+    "@repo/typescript-config": "*",
+    "@types/pg": "^8.20.0",
     "dotenv": "^17.4.2",
     "pg": "^8.22.0"
   }
