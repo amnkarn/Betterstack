@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/Button';
 import { Badge } from '@/components/ui/Badge';
 import { Activity, Menu, X } from 'lucide-react';
+import { Link } from 'react-router-dom';
 
 const navLinks = [
   { label: 'Features', href: '#features' },
@@ -34,7 +35,7 @@ export default function Navbar() {
               <Activity className="w-4 h-4 text-white" />
             </div>
             <span className="font-bold text-lg text-white tracking-tight">
-              PulseWatch
+              Betteruptime
             </span>
             <Badge variant="secondary" className="text-xs px-1.5 py-0 bg-sky-500/15 text-sky-400 border-sky-500/30 hidden sm:flex">
               Beta
@@ -56,12 +57,16 @@ export default function Navbar() {
 
           {/* CTA */}
           <div className="hidden md:flex items-center gap-3">
-            <Button variant="ghost" size="sm" className="text-muted-foreground hover:text-white">
-              Log in
-            </Button>
-            <Button size="sm" className="bg-sky-500 hover:bg-sky-400 text-white glow-sm">
-              Start for free
-            </Button>
+            <Link to={"/auth"}>
+              <Button variant="ghost" size="sm" className="text-muted-foreground hover:text-white">
+                Log in
+              </Button>
+            </Link>
+            <Link to={"/auth"}>
+              <Button size="sm" className="bg-sky-500 hover:bg-sky-400 text-white glow-sm">
+                Start for free
+              </Button>
+            </Link>
           </div>
 
           {/* Mobile toggle */}

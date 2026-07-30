@@ -1,6 +1,7 @@
 import { Button } from '@/components/ui/Button';
 import { Badge } from '@/components/ui/Badge';
 import { ArrowRight, CheckCircle2, Zap } from 'lucide-react';
+import { Link } from 'react-router-dom';
 
 const statusBars = [
   { label: 'API', uptime: '99.99%', bars: Array(30).fill(1).map((_, i) => (i === 12 ? 0.3 : 1)) },
@@ -56,7 +57,7 @@ export default function Hero() {
           className="max-w-2xl text-lg sm:text-xl text-muted-foreground leading-relaxed mb-10 animate-fade-up"
           style={{ animationDelay: '160ms', opacity: 0 }}
         >
-          PulseWatch monitors your websites, APIs, and services from 180+ locations worldwide. Get
+          Betteruptime monitors your websites, APIs, and services from 180+ locations worldwide. Get
           instant alerts via SMS, Slack, or email — and let your users know with a beautiful status
           page.
         </p>
@@ -66,10 +67,12 @@ export default function Hero() {
           className="flex flex-col sm:flex-row gap-3 mb-12 animate-fade-up"
           style={{ animationDelay: '240ms', opacity: 0 }}
         >
-          <Button size="lg" className="bg-sky-500 hover:bg-sky-400 text-white glow px-8 text-base font-semibold h-12">
-            Start monitoring free
-            <ArrowRight className="ml-2 w-4 h-4" />
-          </Button>
+          <Link to={"/auth"}>
+            <Button size="lg" className="bg-sky-500 hover:bg-sky-400 text-white glow px-8 text-base font-semibold h-12">
+              Start monitoring free
+              <ArrowRight className="ml-2 w-4 h-4" />
+            </Button>
+          </Link>
           <Button size="lg" variant="outline" className="border-border text-muted-foreground hover:text-white hover:border-sky-500/50 h-12 text-base">
             View live demo
           </Button>

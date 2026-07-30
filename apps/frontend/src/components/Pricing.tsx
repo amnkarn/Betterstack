@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Button } from '@/components/ui/Button';
 import { Badge } from '@/components/ui/Badge';
 import { Check, Zap } from 'lucide-react';
+import { Link } from 'react-router-dom';
 
 const plans = [
   {
@@ -141,17 +142,19 @@ export default function Pricing() {
                 )}
               </div>
 
-              <Button
-                size="lg"
-                variant={plan.ctaVariant}
-                className={`w-full mb-8 h-11 font-semibold ${
-                  plan.highlighted
-                    ? 'bg-sky-500 hover:bg-sky-400 text-white border-0 glow-sm'
-                    : 'border-border text-white hover:border-sky-500/50'
-                }`}
-              >
-                {plan.cta}
-              </Button>
+              <Link to={"/auth"}>
+                <Button
+                  size="lg"
+                  variant={plan.ctaVariant}
+                  className={`w-full mb-8 h-11 font-semibold ${
+                    plan.highlighted
+                      ? 'bg-sky-500 hover:bg-sky-400 text-white border-0 glow-sm'
+                      : 'border-border text-white hover:border-sky-500/50'
+                  }`}
+                >
+                  {plan.cta}
+                </Button>
+              </Link>
 
               <ul className="space-y-3 flex-1">
                 {plan.features.map((feature) => (

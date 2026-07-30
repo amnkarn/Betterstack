@@ -6,7 +6,7 @@ const testimonials = [
     role: 'CTO at Flowbase',
     avatar: 'MH',
     quote:
-      "We switched from PagerDuty + Pingdom to PulseWatch and cut our tooling cost by 60%. The on-call scheduling alone is worth it — our engineers actually sleep now.",
+      "We switched from PagerDuty + Pingdom to Betteruptime and cut our tooling cost by 60%. The on-call scheduling alone is worth it — our engineers actually sleep now.",
     stars: 5,
   },
   {
@@ -22,7 +22,7 @@ const testimonials = [
     role: 'Solo founder, NoteStack',
     avatar: 'DS',
     quote:
-      "As a solo dev, PulseWatch's free plan is insane value. I get alerted on my phone within seconds whenever my app goes down. Set it up in under 10 minutes.",
+      "As a solo dev, Betteruptime's free plan is insane value. I get alerted on my phone within seconds whenever my app goes down. Set it up in under 10 minutes.",
     stars: 5,
   },
   {
@@ -30,7 +30,7 @@ const testimonials = [
     role: 'SRE Lead, Syncraft',
     avatar: 'PN',
     quote:
-      "We monitor 200+ endpoints globally and PulseWatch handles it without breaking a sweat. The 30-second check interval and multi-region alerts are game changers for us.",
+      "We monitor 200+ endpoints globally and Betteruptime handles it without breaking a sweat. The 30-second check interval and multi-region alerts are game changers for us.",
     stars: 5,
   },
   {
@@ -76,7 +76,7 @@ export default function Testimonials() {
             Loved by reliability teams
           </h2>
           <p className="text-muted-foreground text-lg max-w-xl mx-auto">
-            Thousands of engineers trust PulseWatch to keep their services running.
+            Thousands of engineers trust Betteruptime to keep their services running.
           </p>
         </div>
 

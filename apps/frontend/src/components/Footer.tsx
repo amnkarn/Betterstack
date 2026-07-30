@@ -1,6 +1,7 @@
 import { Button } from './ui/Button';
 import { Activity, ArrowRight } from 'lucide-react';
 import { FaGithub, FaLinkedin, FaTwitter } from "react-icons/fa"
+import { Link } from 'react-router-dom';
 
 const footerLinks = {
   Product: ['Features', 'Pricing', 'Changelog', 'Roadmap', 'Status'],
@@ -30,17 +31,20 @@ export default function Footer() {
               <span className="text-gradient">in 60 seconds.</span>
             </h2>
             <p className="text-muted-foreground text-lg mb-8 max-w-lg mx-auto">
-              Join 12,000+ teams who rely on PulseWatch to protect their uptime and keep their
+              Join 12,000+ teams who rely on Betteruptime to protect their uptime and keep their
               customers happy.
             </p>
             <div className="flex flex-col sm:flex-row gap-3 justify-center">
-              <Button
-                size="lg"
-                className="bg-sky-500 hover:bg-sky-400 text-white glow px-10 text-base h-12 font-semibold"
-              >
-                Create free account
-                <ArrowRight className="ml-2 w-4 h-4" />
-              </Button>
+              <Link to={"/auth"}>
+                <Button
+                  size="lg"
+                  className="bg-sky-500 hover:bg-sky-400 text-white glow px-10 text-base h-12 font-semibold"
+                >
+                  Create free account
+                  <ArrowRight className="ml-2 w-4 h-4" />
+                </Button>
+              </Link>
+              
               <Button
                 size="lg"
                 variant="outline"
@@ -63,7 +67,7 @@ export default function Footer() {
                 <div className="w-8 h-8 rounded-lg bg-sky-500 flex items-center justify-center group-hover:scale-110 transition-transform">
                   <Activity className="w-4 h-4 text-white" />
                 </div>
-                <span className="font-bold text-white text-lg">PulseWatch</span>
+                <span className="font-bold text-white text-lg">Betteruptime</span>
               </a>
               <p className="text-sm text-muted-foreground leading-relaxed mb-5 max-w-[220px]">
                 Uptime monitoring and incident management for modern teams.
@@ -104,7 +108,7 @@ export default function Footer() {
           {/* Bottom bar */}
           <div className="pt-8 border-t border-border flex flex-col sm:flex-row items-center justify-between gap-3">
             <p className="text-xs text-muted-foreground">
-              &copy; {new Date().getFullYear()} PulseWatch, Inc. All rights reserved.
+              &copy; {new Date().getFullYear()} Betteruptime, Inc. All rights reserved.
             </p>
             <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
               <span className="w-1.5 h-1.5 rounded-full bg-green-400 inline-block" />
