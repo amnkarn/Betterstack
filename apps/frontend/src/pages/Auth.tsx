@@ -33,7 +33,7 @@ export default function Auth() {
                 if (passwrodRef.current) passwrodRef.current.value = "";
             } else if(authMode === "Login") {
                 await loginReq(username, password);
-                navigate("/dashboard")
+                navigate("/home")
                 alert("Login successful!");
             }
         } catch (error) {
