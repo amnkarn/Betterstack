@@ -126,3 +126,59 @@ describe("Website status endpoiont", () => {
         expect(website.data.url).toBe(websiteUrl)
     })
 })
+
+describe("Fetch all websites", () => {
+    let userId;
+    let jwt: string;
+
+    beforeAll( async () => {
+        const username = "aman" + Math.random();
+
+        const user = await axios.post(`${BASE_URL}/api/v1/user/signup`, {
+            username: username,
+            password: "password"
+        })
+        userId = user.data.userId;
+
+        const login = await axios.post(`${BASE_URL}/api/v1/user/signin`, {
+            username: username,
+            password: "password"
+        })
+
+        jwt = login.data.token;
+
+        //create the websites
+        await axios.post(`${BASE_URL}/api/v1/website`, {
+            url: "amnkarn" + Math.random(),
+        }, {
+            headers: {
+                'Authorization': `Bearer ${jwt}`
+            }
+        })
+
+        await axios.post(`${BASE_URL}/api/v1/website`, {
+            url: "amkarn" + Math.random(),
+        }, {
+            headers: {
+                'Authorization': `Bearer ${jwt}`
+            }
+        })
+
+    })
+
+    test("without login can't fetch websites", async () => {
+        const response = await axios.get(`${BASE_URL}/api/v1/websites`);
+        expect(response.status).toBe(400);
+    })
+
+    test("with correct user credentials all website should fetch", async () => {
+        const response = await axios.get(`${BASE_URL}/api/v1/websites`, {
+            headers: {
+                'Authorization': `Bearer ${jwt}`
+            }
+        })
+
+        expect(response.status).toBe(200);
+        expect(response.data.websites.length).toBe(2);
+    })
+})

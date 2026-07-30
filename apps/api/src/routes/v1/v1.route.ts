@@ -10,6 +10,24 @@ v1Route.use("/user", userRouter);
 
 v1Route.use("/website", websiteRouter)
 
+v1Route.get("/websites", authMiddleware, async (req, res) => {
+    try {
+        const websites = await prismaClient.website.findMany({
+            where: {
+                user_id: (req as any).userId,
+            }
+        })
+        
+        res.status(200).json({
+            message: "All websites fetched successfully",
+            websites
+        });
+
+    } catch (error) {
+        console.log("Error in fetch all website routes", error);
+    }
+})
+
 v1Route.get("/status/:websiteId", authMiddleware, async (req, res) => {
     const { websiteId } = req.params;
     if(!websiteId) {
