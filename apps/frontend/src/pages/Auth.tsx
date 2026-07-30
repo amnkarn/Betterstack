@@ -1,14 +1,16 @@
 import { loginReq, regiserReq } from "@/api/authApi";
 import Loader from "@/components/Loader";
 import { useRef, useState } from "react"
+import { useNavigate } from "react-router-dom";
 
 
 export default function Auth() {
     type AuthMode = "Register" | "Login";
-    const [authMode, setAuthMode] = useState<AuthMode>("Register");
+    const [authMode, setAuthMode] = useState<AuthMode>("Login");
     const [loading, setLoading] = useState<boolean>(false);
     const usernameRef = useRef<HTMLInputElement>(null);
     const passwrodRef = useRef<HTMLInputElement>(null);
+    const navigate = useNavigate();
 
     async function handleSubmit() {
         const username = usernameRef.current?.value;
@@ -24,15 +26,15 @@ export default function Auth() {
             setLoading(true);
             if(authMode === "Register") {
                 await regiserReq(username, password);
-                setAuthMode("Login");
                 alert("Registration successful! Please sign in.");
+                setAuthMode("Login");
                 // Clear input fields
                 if (usernameRef.current) usernameRef.current.value = "";
                 if (passwrodRef.current) passwrodRef.current.value = "";
             } else if(authMode === "Login") {
                 await loginReq(username, password);
+                navigate("/dashboard")
                 alert("Login successful!");
-                window.location.href = "/dashboard"
             }
         } catch (error) {
             console.error("Authentication error:", error);

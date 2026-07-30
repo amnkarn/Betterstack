@@ -7,6 +7,8 @@ export async function loginReq(username: string, password: string) {
         const res = await axios.post(`${BASE_URL}/api/v1/user/signin`, {
             username,
             password
+        }, {
+            withCredentials: true
         })
 
         console.log(res);
