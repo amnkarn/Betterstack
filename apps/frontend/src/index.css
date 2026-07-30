@@ -28,27 +28,54 @@
 
 @layer base {
   :root {
-    --background: 222 47% 5%;
-    --foreground: 210 40% 98%;
-    --card: 222 47% 7%;
-    --card-foreground: 210 40% 98%;
-    --popover: 222 47% 7%;
-    --popover-foreground: 210 40% 98%;
-    --primary: 199 89% 48%;
-    --primary-foreground: 222 47% 5%;
-    --secondary: 217 33% 12%;
-    --secondary-foreground: 210 40% 98%;
-    --muted: 217 33% 12%;
-    --muted-foreground: 215 20% 55%;
-    --accent: 199 89% 48%;
-    --accent-foreground: 222 47% 5%;
-    --destructive: 0 72% 51%;
-    --destructive-foreground: 210 40% 98%;
-    --border: 217 33% 14%;
-    --input: 217 33% 14%;
-    --ring: 199 89% 48%;
-    --radius: 0.625rem;
+    /* Light Mode: SaaS Tech */
+    --background: 0 0% 100%; /* Pure White #FFFFFF */
+    --foreground: 217 33% 17%; /* Slate Dark #1E293B */
+    --card: 0 0% 100%;
+    --card-foreground: 217 33% 17%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 217 33% 17%;
+    --primary: 243 75% 59%; /* Indigo Blue #4F46E5 */
+    --primary-foreground: 0 0% 100%;
+    --secondary: 217 33% 90%; /* Slate light */
+    --secondary-foreground: 217 33% 17%;
+    --muted: 217 33% 96%;
+    --muted-foreground: 217 33% 40%;
+    --accent: 243 75% 95%; /* Light Indigo */
+    --accent-foreground: 243 75% 59%;
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 217 33% 90%; /* Slate 200 */
+    --input: 217 33% 90%;
+    --ring: 243 75% 59%;
+    --radius: 0.5rem; /* Softer Corners: 8px */
 
+    --success: 142 71% 45%;
+    --warning: 38 92% 50%;
+    --error: 0 72% 51%;
+  }
+
+  .dark {
+    /* Deep Dark Mode */
+    --background: 240 10% 4%; /* Midnight #09090B */
+    --foreground: 0 0% 98%;
+    --card: 240 10% 4%;
+    --card-foreground: 0 0% 98%;
+    --popover: 240 10% 4%;
+    --popover-foreground: 0 0% 98%;
+    --primary: 189 94% 43%; /* Electric Cyan #06B6D4 */
+    --primary-foreground: 240 10% 4%;
+    --secondary: 240 4% 16%; /* Zinc Gray #27272A */
+    --secondary-foreground: 0 0% 98%;
+    --muted: 240 4% 16%;
+    --muted-foreground: 240 5% 65%; /* Zinc-400 */
+    --accent: 240 4% 16%;
+    --accent-foreground: 0 0% 98%;
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 240 4% 16%; /* Zinc Gray for subtle borders */
+    --input: 240 4% 16%;
+    --ring: 189 94% 43%;
     --success: 142 71% 45%;
     --warning: 38 92% 50%;
     --error: 0 72% 51%;
@@ -83,7 +110,7 @@
   }
 
   .glass {
-    @apply bg-white/5 backdrop-blur-md border border-white/10;
+    @apply bg-card/40 backdrop-blur-md border border-border/50;
   }
 }
 

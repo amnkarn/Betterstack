@@ -67,7 +67,7 @@ export default function AddMonitorModal({ open, onClose, onCreated }: AddMonitor
 
     return (
         <AlertDialog open={open} onOpenChange={(o) => !o && onClose()}>
-            <AlertDialogContent className="bg-card border-border text-white max-w-md">
+            <AlertDialogContent className="bg-card border-border text-foreground max-w-md">
                 <AlertDialogHeader>
                     <AlertDialogTitle>Add New Monitor</AlertDialogTitle>
                     <AlertDialogDescription className="text-muted-foreground">
@@ -77,39 +77,40 @@ export default function AddMonitorModal({ open, onClose, onCreated }: AddMonitor
 
                 <form onSubmit={handleSubmit} className="space-y-4">
                     <div>
-                        <label className="text-sm font-medium text-white mb-1 block">Name</label>
+                        <label className="text-sm font-medium text-foreground mb-1 block">Name</label>
                         <Input
                             placeholder="e.g., Production API"
                             value={name}
                             onChange={(e) => setName(e.target.value)}
-                            className="bg-background border-border text-white placeholder:text-muted-foreground"
+                            className="bg-background border-border text-foreground placeholder:text-muted-foreground focus-visible:ring-primary/50"
                             required
                         />
                     </div>
 
                     <div>
-                        <label className="text-sm font-medium text-white mb-1 block">URL</label>
+                        <label className="text-sm font-medium text-foreground mb-1 block">URL</label>
                         <Input
+                            type="url"
                             placeholder="https://api.example.com"
                             value={url}
                             onChange={(e) => setUrl(e.target.value)}
-                            className="bg-background border-border text-white placeholder:text-muted-foreground"
+                            className="bg-background border-border text-foreground placeholder:text-muted-foreground focus-visible:ring-primary/50"
                             required
                         />
                     </div>
 
                     <div>
-                        <label className="text-sm font-medium text-white mb-1 block">Check Interval</label>
-                        <div className="grid grid-cols-3 gap-2">
+                        <label className="text-sm font-medium text-foreground mb-1 block">Check Interval</label>
+                        <div className="grid grid-cols-4 gap-2">
                             {intervalOptions.map((option) => (
                                 <button
                                     key={option.value}
                                     type="button"
                                     onClick={() => setInterval(option.value)}
-                                    className={`px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
+                                    className={`py-2 rounded-lg text-sm font-medium transition-colors ${
                                         interval === option.value
-                                            ? 'bg-sky-500 text-white'
-                                            : 'bg-background border border-border text-muted-foreground hover:text-white hover:bg-white/5'
+                                            ? 'bg-primary text-primary-foreground'
+                                            : 'bg-background border border-border text-muted-foreground hover:text-foreground hover:bg-secondary/50'
                                     }`}
                                 >
                                     {option.label}
@@ -120,14 +121,14 @@ export default function AddMonitorModal({ open, onClose, onCreated }: AddMonitor
 
                     <AlertDialogFooter>
                         <AlertDialogCancel
-                            className="bg-transparent border-border text-muted-foreground hover:text-white hover:bg-white/5"
+                            className="bg-transparent border-border text-muted-foreground hover:text-foreground hover:bg-secondary/50"
                             type="button"
                             onClick={onClose}
                         >
                             Cancel
                         </AlertDialogCancel>
                         <AlertDialogAction
-                            className="bg-sky-500 hover:bg-sky-400 text-white border-0"
+                            className="bg-primary hover:bg-primary/90 text-primary-foreground border-0"
                             type="submit"
                             disabled={loading}
                         >

@@ -52,27 +52,27 @@ const testimonials = [
 ];
 
 const avatarColors = [
-  'bg-sky-500',
-  'bg-emerald-500',
-  'bg-violet-500',
-  'bg-amber-500',
-  'bg-rose-500',
-  'bg-cyan-500',
+  'bg-blue-500/10 text-blue-500',
+  'bg-emerald-500/10 text-emerald-500',
+  'bg-violet-500/10 text-violet-500',
+  'bg-amber-500/10 text-amber-500',
+  'bg-rose-500/10 text-rose-500',
+  'bg-indigo-500/10 text-indigo-500',
 ];
 
 export default function Testimonials() {
   return (
-    <section id="testimonials" className="py-24 relative overflow-hidden">
+    <section id="testimonials" className="py-32 relative overflow-hidden">
       <div className="absolute inset-0 -z-10">
-        <div className="absolute top-0 left-0 w-[500px] h-[400px] rounded-full bg-sky-500/5 blur-3xl" />
+        <div className="absolute top-0 left-0 w-[500px] h-[400px] rounded-full bg-primary/5 blur-3xl" />
       </div>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center mb-16">
-          <p className="text-sky-400 font-medium text-sm uppercase tracking-widest mb-3">
+        <div className="text-center mb-24">
+          <p className="text-primary font-medium text-sm uppercase tracking-widest mb-4">
             Testimonials
           </p>
-          <h2 className="text-4xl sm:text-5xl font-bold text-white mb-4 tracking-tight">
+          <h2 className="text-4xl sm:text-5xl font-bold text-foreground mb-6 tracking-tight">
             Loved by reliability teams
           </h2>
           <p className="text-muted-foreground text-lg max-w-xl mx-auto">
@@ -80,35 +80,35 @@ export default function Testimonials() {
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {testimonials.map((t, i) => (
             <div
               key={t.name}
-              className="group p-6 rounded-xl border border-border bg-card hover:border-sky-500/30 hover:bg-white/[0.02] transition-all duration-300"
+              className="group p-10 rounded-2xl border border-border/50 bg-card/50 hover:border-primary/30 hover:bg-secondary/20 transition-all duration-300 backdrop-blur-sm shadow-sm hover:shadow-md"
             >
               {/* Stars */}
-              <div className="flex gap-0.5 mb-4">
+              <div className="flex gap-1 mb-6">
                 {Array(t.stars)
                   .fill(0)
                   .map((_, si) => (
-                    <Star key={si} className="w-4 h-4 fill-sky-400 text-sky-400" />
+                    <Star key={si} className="w-4 h-4 fill-amber-400 text-amber-400" />
                   ))}
               </div>
 
               {/* Quote */}
-              <p className="text-muted-foreground text-sm leading-relaxed mb-5 flex-1">
+              <p className="text-muted-foreground text-sm leading-relaxed mb-8 flex-1">
                 "{t.quote}"
               </p>
 
               {/* Author */}
-              <div className="flex items-center gap-3">
+              <div className="flex items-center gap-4">
                 <div
-                  className={`w-9 h-9 rounded-full ${avatarColors[i]} flex items-center justify-center text-white text-xs font-bold shrink-0`}
+                  className={`w-10 h-10 rounded-full ${avatarColors[i]} flex items-center justify-center text-xs font-bold shrink-0 shadow-sm border border-border/50`}
                 >
                   {t.avatar}
                 </div>
                 <div>
-                  <div className="text-white text-sm font-semibold">{t.name}</div>
+                  <div className="text-foreground text-sm font-semibold">{t.name}</div>
                   <div className="text-muted-foreground text-xs">{t.role}</div>
                 </div>
               </div>
@@ -117,7 +117,7 @@ export default function Testimonials() {
         </div>
 
         {/* Social proof bar */}
-        <div className="mt-14 py-8 border-y border-border grid grid-cols-2 sm:grid-cols-4 gap-6 text-center">
+        <div className="mt-20 py-10 border-y border-border grid grid-cols-2 sm:grid-cols-4 gap-8 text-center bg-card/30 backdrop-blur-sm">
           {[
             { value: '12,000+', label: 'Teams monitoring' },
             { value: '4.9/5', label: 'Average rating' },
@@ -125,7 +125,7 @@ export default function Testimonials() {
             { value: '99.99%', label: 'Platform uptime' },
           ].map((stat) => (
             <div key={stat.label}>
-              <div className="text-2xl sm:text-3xl font-extrabold text-white mb-1">{stat.value}</div>
+              <div className="text-2xl sm:text-3xl font-extrabold text-foreground mb-1">{stat.value}</div>
               <div className="text-sm text-muted-foreground">{stat.label}</div>
             </div>
           ))}

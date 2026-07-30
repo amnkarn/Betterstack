@@ -26,6 +26,7 @@ import AddMonitorModal from '@/components/AddMonitorModal';
 import DashboardSidebar from '@/components/DashboardSidebar';
 import StatCard from '@/components/StatCard';
 import MonitorsTable from '@/components/MonitorsTable';
+import ThemeToggle from '@/components/ThemeToggle';
 import { mockApi } from '@/lib/mockApi';
 
 interface Props {
@@ -112,13 +113,13 @@ export default function Dashboard({ onBack }: Props) {
                         {/* Mobile logo */}
                         <button
                             onClick={onBack}
-                            className="flex lg:hidden items-center gap-2 text-muted-foreground hover:text-white"
+                            className="flex lg:hidden items-center gap-2 text-muted-foreground hover:text-foreground"
                         >
-                            <Activity className="w-5 h-5 text-sky-400" />
-                            <span className="font-bold text-white">PulseWatch</span>
+                            <Activity className="w-5 h-5 text-primary" />
+                            <span className="font-bold text-foreground">PulseWatch</span>
                         </button>
                         <div className="hidden lg:block">
-                            <h1 className="text-white font-semibold text-lg">Monitors</h1>
+                            <h1 className="text-foreground font-semibold text-lg">Monitors</h1>
                             <p className="text-muted-foreground text-xs">
                                 {monitors.length} monitor{monitors.length !== 1 ? 's' : ''} tracked
                             </p>
@@ -126,10 +127,11 @@ export default function Dashboard({ onBack }: Props) {
                     </div>
 
                     <div className="flex items-center gap-2">
+                        <ThemeToggle />
                         <Button
                             variant="ghost"
                             size="icon"
-                            className="text-muted-foreground hover:text-white h-9 w-9"
+                            className="text-muted-foreground hover:text-foreground h-9 w-9"
                             onClick={() => fetchMonitors(true)}
                             disabled={refreshing}
                         >
@@ -137,7 +139,7 @@ export default function Dashboard({ onBack }: Props) {
                         </Button>
                         <Button
                             size="sm"
-                            className="bg-sky-500 hover:bg-sky-400 text-white font-semibold gap-1.5"
+                            className="bg-primary hover:bg-primary/90 text-primary-foreground font-semibold gap-1.5"
                             onClick={() => setModalOpen(true)}
                         >
                             <Plus className="w-4 h-4" />
@@ -153,7 +155,7 @@ export default function Dashboard({ onBack }: Props) {
                             label="Total monitors"
                             value={monitors.length}
                             icon={Activity}
-                            color="bg-sky-500/10 text-sky-400"
+                            color="bg-primary/10 text-primary"
                         />
                         <StatCard
                             label="Monitors up"
@@ -185,7 +187,7 @@ export default function Dashboard({ onBack }: Props) {
                                     placeholder="Search monitors…"
                                     value={search}
                                     onChange={(e) => setSearch(e.target.value)}
-                                    className="pl-9 bg-background border-border text-white placeholder:text-muted-foreground h-9 text-sm focus-visible:ring-sky-500/50"
+                                    className="pl-9 bg-background border-border text-foreground placeholder:text-muted-foreground h-9 text-sm focus-visible:ring-primary/50"
                                 />
                             </div>
                             <p className="text-xs text-muted-foreground ml-auto">
@@ -196,7 +198,7 @@ export default function Dashboard({ onBack }: Props) {
                         {/* Loading */}
                         {loading ? (
                             <div className="flex flex-col items-center justify-center py-20 gap-3">
-                                <Loader2 className="w-8 h-8 text-sky-400 animate-spin" />
+                                <Loader2 className="w-8 h-8 text-primary animate-spin" />
                                 <p className="text-muted-foreground text-sm">Loading monitors…</p>
                             </div>
                         ) : (
@@ -220,21 +222,21 @@ export default function Dashboard({ onBack }: Props) {
 
             {/* Delete confirmation */}
             <AlertDialog open={!!deleteTarget} onOpenChange={(o) => !o && setDeleteTarget(null)}>
-                <AlertDialogContent className="bg-card border-border text-white">
+                <AlertDialogContent className="bg-card border-border text-foreground">
                     <AlertDialogHeader>
                         <AlertDialogTitle>Delete monitor?</AlertDialogTitle>
                         <AlertDialogDescription className="text-muted-foreground">
                             This will permanently delete{' '}
-                            <span className="text-white font-medium">{deleteTarget?.name}</span> and all its data.
+                            <span className="text-foreground font-medium">{deleteTarget?.name}</span> and all its data.
                             This action cannot be undone.
                         </AlertDialogDescription>
                     </AlertDialogHeader>
                     <AlertDialogFooter>
-                        <AlertDialogCancel className="bg-transparent border-border text-muted-foreground hover:text-white hover:bg-white/5">
+                        <AlertDialogCancel className="bg-transparent border-border text-muted-foreground hover:text-foreground hover:bg-secondary/50">
                             Cancel
                         </AlertDialogCancel>
                         <AlertDialogAction
-                            className="bg-red-500 hover:bg-red-400 text-white border-0"
+                            className="bg-destructive hover:bg-destructive/90 text-destructive-foreground border-0"
                             onClick={deleteMonitor}
                             disabled={deleting}
                         >

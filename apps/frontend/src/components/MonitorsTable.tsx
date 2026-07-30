@@ -50,16 +50,14 @@ export default function MonitorsTable({
 }: MonitorsTableProps) {
     if (monitors.length === 0) {
         return (
-            <div className="flex flex-col items-center justify-center py-20 gap-4">
-                <div className="w-16 h-16 rounded-2xl bg-sky-500/10 border border-sky-500/20 flex items-center justify-center">
-                    <Activity className="w-8 h-8 text-sky-400/60" />
+            <div className="flex flex-col items-center justify-center py-20 text-center">
+                <div className="w-12 h-12 rounded-full bg-secondary/30 flex items-center justify-center mb-4">
+                    <Activity className="w-6 h-6 text-muted-foreground" />
                 </div>
-                <div className="text-center">
-                    <p className="text-white font-medium mb-1">No monitors yet</p>
-                    <p className="text-muted-foreground text-sm max-w-xs">
-                        Add your first website or API endpoint to start tracking its uptime.
-                    </p>
-                </div>
+                <p className="text-foreground font-medium mb-1">No monitors yet</p>
+                <p className="text-muted-foreground text-sm max-w-sm mb-6">
+                    Add your first monitor to start tracking uptime and get alerted when things go wrong.
+                </p>
             </div>
         );
     }
@@ -89,9 +87,9 @@ export default function MonitorsTable({
                     {filteredMonitors.map((monitor) => (
                         <TableRow
                             key={monitor.id}
-                            className="border-border hover:bg-white/[0.02] transition-colors"
+                            className="group hover:bg-secondary/20 border-border"
                         >
-                            <TableCell className="pl-5 font-medium text-white py-4">
+                            <TableCell className="pl-5 font-medium text-foreground py-4">
                                 {monitor.name}
                             </TableCell>
                             <TableCell>
@@ -99,7 +97,7 @@ export default function MonitorsTable({
                                     href={monitor.url}
                                     target="_blank"
                                     rel="noopener noreferrer"
-                                    className="flex items-center gap-1.5 text-sky-400 hover:text-sky-300 transition-colors text-sm font-mono max-w-[200px] truncate"
+                                    className="flex items-center gap-1.5 text-primary hover:text-primary/80 transition-colors text-sm font-mono max-w-[200px] truncate"
                                 >
                                     {monitor.url.replace(/^https?:\/\//, '')}
                                     <ExternalLink className="w-3 h-3 shrink-0" />
@@ -156,17 +154,17 @@ export default function MonitorsTable({
                                         <Button
                                             variant="ghost"
                                             size="icon"
-                                            className="h-8 w-8 text-muted-foreground hover:text-white hover:bg-white/5"
+                                            className="h-8 w-8 text-muted-foreground hover:text-foreground hover:bg-secondary/50"
                                         >
-                                            <MoreHorizontal className="w-4 h-4" />
+                                            <MoreHorizontal className="h-4 w-4" />
                                         </Button>
                                     </DropdownMenuTrigger>
                                     <DropdownMenuContent
                                         align="end"
-                                        className="bg-card border-border text-white w-44"
+                                        className="bg-card border-border text-foreground w-44"
                                     >
                                         <DropdownMenuItem
-                                            className="gap-2 cursor-pointer hover:bg-white/5 focus:bg-white/5"
+                                            className="gap-2 cursor-pointer hover:bg-secondary focus:bg-secondary"
                                             onClick={() =>
                                                 window.open(monitor.url, '_blank', 'noopener,noreferrer')
                                             }
@@ -175,7 +173,7 @@ export default function MonitorsTable({
                                             Visit URL
                                         </DropdownMenuItem>
                                         <DropdownMenuItem
-                                            className="gap-2 cursor-pointer hover:bg-white/5 focus:bg-white/5"
+                                            className="gap-2 cursor-pointer hover:bg-secondary/50 focus:bg-secondary/50"
                                             onClick={() => onTogglePause(monitor)}
                                         >
                                             {monitor.status === 'paused' ? (

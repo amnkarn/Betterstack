@@ -71,7 +71,7 @@ export function AlertDialogContent({ children, className = '' }: AlertDialogCont
     return (
         <div className="fixed inset-0 z-50 flex items-center justify-center">
             <div
-                className="fixed inset-0 bg-black/50"
+                className="fixed inset-0 bg-background/80 backdrop-blur-sm data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0"
                 onClick={() => setOpen(false)}
             />
             <div
@@ -88,7 +88,7 @@ export function AlertDialogHeader({ children }: AlertDialogHeaderProps) {
 }
 
 export function AlertDialogTitle({ children }: AlertDialogTitleProps) {
-    return <h2 className="text-lg font-semibold text-white">{children}</h2>;
+    return <h2 className="text-lg font-semibold text-foreground">{children}</h2>;
 }
 
 export function AlertDialogDescription({ children, className = '' }: AlertDialogDescriptionProps) {

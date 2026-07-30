@@ -69,14 +69,14 @@ export default function Pricing() {
   const [yearly, setYearly] = useState(true);
 
   return (
-    <section id="pricing" className="py-24 relative">
+    <section id="pricing" className="py-32 relative">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center mb-14">
-          <p className="text-sky-400 font-medium text-sm uppercase tracking-widest mb-3">Pricing</p>
-          <h2 className="text-4xl sm:text-5xl font-bold text-white mb-4 tracking-tight">
+        <div className="text-center mb-16">
+          <p className="text-primary font-medium text-sm uppercase tracking-widest mb-4">Pricing</p>
+          <h2 className="text-4xl sm:text-5xl font-bold text-foreground mb-6 tracking-tight">
             Simple, transparent pricing
           </h2>
-          <p className="text-muted-foreground text-lg max-w-xl mx-auto mb-8">
+          <p className="text-muted-foreground text-lg max-w-xl mx-auto mb-10">
             Start free, scale when you're ready. No hidden fees or per-alert charges.
           </p>
 
@@ -85,7 +85,7 @@ export default function Pricing() {
             <button
               onClick={() => setYearly(false)}
               className={`px-4 py-1.5 rounded-full text-sm font-medium transition-all ${
-                !yearly ? 'bg-white text-background' : 'text-muted-foreground hover:text-white'
+                !yearly ? 'bg-primary text-primary-foreground' : 'text-muted-foreground hover:text-foreground'
               }`}
             >
               Monthly
@@ -93,11 +93,13 @@ export default function Pricing() {
             <button
               onClick={() => setYearly(true)}
               className={`px-4 py-1.5 rounded-full text-sm font-medium transition-all flex items-center gap-1.5 ${
-                yearly ? 'bg-white text-background' : 'text-muted-foreground hover:text-white'
+                yearly ? 'bg-primary text-primary-foreground' : 'text-muted-foreground hover:text-foreground'
               }`}
             >
               Yearly
-              <span className="text-[10px] font-bold text-sky-500 bg-sky-500/15 px-1.5 py-0.5 rounded-full">
+              <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded-md ${
+                yearly ? 'bg-primary-foreground text-primary' : 'text-primary bg-primary/15'
+              }`}>
                 -25%
               </span>
             </button>
@@ -108,29 +110,29 @@ export default function Pricing() {
           {plans.map((plan) => (
             <div
               key={plan.name}
-              className={`relative flex flex-col rounded-2xl p-8 border transition-all duration-300 ${
+              className={`relative flex flex-col rounded-2xl p-10 border transition-all duration-300 ${
                 plan.highlighted
-                  ? 'border-sky-500/60 bg-sky-500/5 glow'
-                  : 'border-border bg-card hover:border-sky-500/30'
+                  ? 'border-primary/60 bg-primary/5 glow'
+                  : 'border-border/50 bg-card hover:border-primary/30 shadow-sm hover:shadow-md'
               }`}
             >
               {plan.badge && (
                 <div className="absolute -top-3.5 left-1/2 -translate-x-1/2">
-                  <Badge className="bg-sky-500 text-white border-0 px-3 py-1 text-xs font-semibold flex items-center gap-1">
-                    <Zap className="w-3 h-3 fill-white" />
+                  <Badge className="bg-primary text-primary-foreground border-0 px-4 py-1 text-xs font-semibold flex items-center gap-1 rounded-md shadow-sm">
+                    <Zap className="w-3 h-3 fill-primary-foreground" />
                     {plan.badge}
                   </Badge>
                 </div>
               )}
 
               <div className="mb-6">
-                <h3 className="text-white font-bold text-xl mb-1">{plan.name}</h3>
+                <h3 className="text-foreground font-bold text-xl mb-1">{plan.name}</h3>
                 <p className="text-muted-foreground text-sm">{plan.description}</p>
               </div>
 
               <div className="mb-8">
                 <div className="flex items-end gap-1">
-                  <span className="text-5xl font-extrabold text-white">
+                  <span className="text-5xl font-extrabold text-foreground">
                     ${yearly ? plan.yearlyPrice : plan.monthlyPrice}
                   </span>
                   <span className="text-muted-foreground mb-2">/mo</span>
@@ -146,10 +148,10 @@ export default function Pricing() {
                 <Button
                   size="lg"
                   variant={plan.ctaVariant}
-                  className={`w-full mb-8 h-11 font-semibold ${
+                  className={`w-full mb-8 h-12 font-semibold rounded-lg ${
                     plan.highlighted
-                      ? 'bg-sky-500 hover:bg-sky-400 text-white border-0 glow-sm'
-                      : 'border-border text-white hover:border-sky-500/50'
+                      ? 'bg-primary hover:bg-primary/90 text-primary-foreground border-0 glow-sm'
+                      : 'border-border text-foreground hover:border-primary hover:bg-secondary/20'
                   }`}
                 >
                   {plan.cta}
@@ -158,8 +160,8 @@ export default function Pricing() {
 
               <ul className="space-y-3 flex-1">
                 {plan.features.map((feature) => (
-                  <li key={feature} className="flex items-start gap-2.5 text-sm">
-                    <Check className="w-4 h-4 text-sky-400 mt-0.5 shrink-0" />
+                  <li key={feature} className="flex items-start gap-3 text-sm">
+                    <Check className="w-4 h-4 text-primary mt-0.5 shrink-0" />
                     <span className="text-muted-foreground">{feature}</span>
                   </li>
                 ))}

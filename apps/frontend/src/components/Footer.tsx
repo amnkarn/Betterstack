@@ -22,10 +22,10 @@ export default function Footer() {
 
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <div className="glass rounded-3xl px-8 py-16 glow">
-            <div className="inline-flex w-16 h-16 rounded-2xl bg-sky-500/20 border border-sky-500/40 items-center justify-center mb-6 mx-auto">
-              <Activity className="w-8 h-8 text-sky-400" />
+            <div className="inline-flex w-16 h-16 rounded-2xl bg-primary/20 border border-primary/40 items-center justify-center mb-6 mx-auto">
+              <Activity className="w-8 h-8 text-primary" />
             </div>
-            <h2 className="text-4xl sm:text-5xl font-extrabold text-white mb-4 tracking-tight">
+            <h2 className="text-4xl sm:text-5xl font-extrabold text-foreground mb-4 tracking-tight">
               Start monitoring
               <br />
               <span className="text-gradient">in 60 seconds.</span>
@@ -38,7 +38,7 @@ export default function Footer() {
               <Link to={"/auth"}>
                 <Button
                   size="lg"
-                  className="bg-sky-500 hover:bg-sky-400 text-white glow px-10 text-base h-12 font-semibold"
+                  className="bg-primary hover:bg-primary/90 text-primary-foreground glow px-10 text-base h-12 font-semibold"
                 >
                   Create free account
                   <ArrowRight className="ml-2 w-4 h-4" />
@@ -48,7 +48,7 @@ export default function Footer() {
               <Button
                 size="lg"
                 variant="outline"
-                className="border-border text-muted-foreground hover:text-white hover:border-sky-500/50 h-12 text-base"
+                className="border-border text-foreground hover:bg-secondary/50 h-12 text-base transition-colors"
               >
                 Talk to sales
               </Button>
@@ -64,10 +64,10 @@ export default function Footer() {
             {/* Brand */}
             <div className="col-span-2">
               <a href="#" className="flex items-center gap-2 mb-4 group w-fit">
-                <div className="w-8 h-8 rounded-lg bg-sky-500 flex items-center justify-center group-hover:scale-110 transition-transform">
-                  <Activity className="w-4 h-4 text-white" />
+                <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center glow-sm transition-transform group-hover:scale-110">
+                  <Activity className="w-4 h-4 text-primary-foreground" />
                 </div>
-                <span className="font-bold text-white text-lg">Betteruptime</span>
+                <span className="font-bold text-foreground text-lg">Betteruptime</span>
               </a>
               <p className="text-sm text-muted-foreground leading-relaxed mb-5 max-w-[220px]">
                 Uptime monitoring and incident management for modern teams.
@@ -77,7 +77,7 @@ export default function Footer() {
                   <a
                     key={i}
                     href="#"
-                    className="w-8 h-8 rounded-lg border border-border hover:border-sky-500/50 flex items-center justify-center text-muted-foreground hover:text-white transition-all"
+                    className="w-8 h-8 rounded-lg border border-border hover:border-primary/50 flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-secondary/20 transition-all"
                   >
                     <Icon className="w-4 h-4" />
                   </a>
@@ -88,13 +88,13 @@ export default function Footer() {
             {/* Links */}
             {Object.entries(footerLinks).map(([category, links]) => (
               <div key={category}>
-                <h4 className="text-white font-semibold text-sm mb-4">{category}</h4>
-                <ul className="space-y-2.5">
+                <h4 className="text-foreground font-semibold text-sm mb-4">{category}</h4>
+                <ul className="space-y-3">
                   {links.map((link) => (
                     <li key={link}>
                       <a
                         href="#"
-                        className="text-sm text-muted-foreground hover:text-white transition-colors"
+                        className="text-sm text-muted-foreground hover:text-foreground transition-colors"
                       >
                         {link}
                       </a>

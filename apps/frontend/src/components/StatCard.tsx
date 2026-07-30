@@ -18,7 +18,7 @@ export default function StatCard({
             </div>
             <div>
                 <p className="text-muted-foreground text-xs mb-0.5">{label}</p>
-                <p className="text-white text-2xl font-bold leading-none">{value}</p>
+                <p className="text-foreground text-2xl font-bold leading-none">{value}</p>
             </div>
         </div>
     );

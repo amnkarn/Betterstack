@@ -21,8 +21,8 @@ export default function Hero() {
     <section className="relative min-h-screen flex flex-col items-center justify-center overflow-hidden pt-16">
       {/* Background glow */}
       <div className="absolute inset-0 -z-10">
-        <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-[800px] h-[500px] rounded-full bg-sky-500/8 blur-3xl" />
-        <div className="absolute top-1/3 left-1/4 w-[400px] h-[300px] rounded-full bg-cyan-400/5 blur-3xl" />
+        <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-[800px] h-[500px] rounded-full bg-primary/10 blur-3xl" />
+        <div className="absolute top-1/3 left-1/4 w-[400px] h-[300px] rounded-full bg-primary/5 blur-3xl" />
         {/* Grid */}
         <div
           className="absolute inset-0 opacity-[0.04]"
@@ -36,20 +36,20 @@ export default function Hero() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 flex flex-col items-center text-center">
         {/* Pill badge */}
         <div className="mb-6 animate-fade-up" style={{ animationDelay: '0ms' }}>
-          <Badge className="bg-sky-500/10 text-sky-400 border border-sky-500/30 px-4 py-1.5 text-sm font-medium hover:bg-sky-500/10">
-            <Zap className="w-3.5 h-3.5 mr-1.5 fill-sky-400" />
+          <Badge className="bg-primary/10 text-primary border border-primary/30 px-6 py-2 text-sm font-medium hover:bg-primary/20 rounded-full transition-colors">
+            <Zap className="w-3.5 h-3.5 mr-1.5 fill-primary" />
             Uptime monitoring, reimagined
           </Badge>
         </div>
 
         {/* Headline */}
         <h1
-          className="text-5xl sm:text-6xl lg:text-7xl font-extrabold tracking-tight leading-tight mb-6 animate-fade-up"
+          className="text-5xl sm:text-6xl lg:text-7xl font-extrabold tracking-tight leading-tight mb-6 animate-fade-up text-foreground"
           style={{ animationDelay: '80ms', opacity: 0 }}
         >
           Know when your site
           <br />
-          <span className="text-gradient">goes down first.</span>
+          <span className="bg-clip-text text-transparent bg-gradient-to-r from-primary to-blue-500">goes down first.</span>
         </h1>
 
         {/* Sub */}
@@ -64,28 +64,28 @@ export default function Hero() {
 
         {/* CTAs */}
         <div
-          className="flex flex-col sm:flex-row gap-3 mb-12 animate-fade-up"
+          className="flex flex-col sm:flex-row gap-4 mb-16 animate-fade-up"
           style={{ animationDelay: '240ms', opacity: 0 }}
         >
           <Link to={"/auth"}>
-            <Button size="lg" className="bg-sky-500 hover:bg-sky-400 text-white glow px-8 text-base font-semibold h-12">
+            <Button size="lg" className="bg-primary hover:bg-primary/90 text-primary-foreground glow px-8 text-base font-semibold h-14 rounded-xl">
               Start monitoring free
               <ArrowRight className="ml-2 w-4 h-4" />
             </Button>
           </Link>
-          <Button size="lg" variant="outline" className="border-border text-muted-foreground hover:text-white hover:border-sky-500/50 h-12 text-base">
+          <Button size="lg" variant="outline" className="border-border text-foreground hover:bg-secondary/50 h-14 text-base rounded-xl px-8 transition-colors">
             View live demo
           </Button>
         </div>
 
         {/* Trust signals */}
         <div
-          className="flex flex-wrap justify-center gap-x-6 gap-y-2 mb-16 animate-fade-up"
+          className="flex flex-wrap justify-center gap-x-8 gap-y-3 mb-20 animate-fade-up"
           style={{ animationDelay: '300ms', opacity: 0 }}
         >
           {['No credit card required', 'Free forever plan', 'Setup in 60 seconds'].map((t) => (
-            <span key={t} className="flex items-center gap-1.5 text-sm text-muted-foreground">
-              <CheckCircle2 className="w-3.5 h-3.5 text-sky-500" />
+            <span key={t} className="flex items-center gap-2 text-sm text-muted-foreground">
+              <CheckCircle2 className="w-4 h-4 text-primary" />
               {t}
             </span>
           ))}
@@ -96,17 +96,17 @@ export default function Hero() {
           className="w-full max-w-4xl animate-fade-up"
           style={{ animationDelay: '380ms', opacity: 0 }}
         >
-          <div className="glass rounded-2xl p-6 glow">
+          <div className="rounded-2xl p-10 glow border border-border/50 bg-card/50 backdrop-blur-md">
             {/* Top bar */}
             <div className="flex items-center justify-between mb-6">
               <div className="flex items-center gap-2">
-                <div className="w-2.5 h-2.5 rounded-full bg-green-400 animate-pulse" />
-                <span className="text-sm font-medium text-white">All systems operational</span>
+                <div className="w-2.5 h-2.5 rounded-full bg-green-500 animate-pulse" />
+                <span className="text-sm font-medium text-foreground">All systems operational</span>
               </div>
               <div className="flex items-center gap-4">
                 {metrics.map((m) => (
                   <div key={m.label} className="text-center hidden sm:block">
-                    <div className="text-sm font-bold text-white">{m.value}</div>
+                    <div className="text-sm font-bold text-foreground">{m.value}</div>
                     <div className="text-xs text-muted-foreground">{m.label}</div>
                   </div>
                 ))}
