@@ -2,16 +2,6 @@ import { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import {
-    AlertDialog,
-    AlertDialogAction,
-    AlertDialogCancel,
-    AlertDialogContent,
-    AlertDialogDescription,
-    AlertDialogFooter,
-    AlertDialogHeader,
-    AlertDialogTitle,
-} from '@/components/ui/alert-dialog';
-import {
     Activity,
     Plus,
     Search,
@@ -41,7 +31,11 @@ export default function Dashboard() {
     const [loading, setLoading] = useState(false); // for loader
 
 
-    const fetchWebs = async () => {
+    const fetchWebs = async (isInitial = false) => {
+        if(isInitial) {
+            setLoading(true);
+        }
+
         try {
             const res = await fetchWebsites();
             console.log(res);
@@ -58,26 +52,24 @@ export default function Dashboard() {
 
         } catch (error) {
             console.log(error);
+        } finally {
+            if(isInitial) setLoading(false);
         }
     }
 
     useEffect(() => {
-        fetchWebs(); //initial fetch
-
+        fetchWebs(true); //initial fetch
+        
         const interval = setInterval(async () => {
-            await fetchWebs();
+            await fetchWebs(false);
         }, 30000)
 
-        clearInterval(interval);
+        return () => clearInterval(interval);
     }, [])
 
     const upCount = websites.filter((m) => m.status === "Up").length;
     const downCount = websites.filter((m) => m.status === "Down").length;
-    //const avgUptime =
-    //    websites.length > 0
-    //        ? (monitors.reduce((a, m) => a + Number(m.uptime_percentage), 0) / monitors.length).toFixed(2)
-    //        : '—';
-
+    
     const [search, setSearch] = useState(''); //search the website
 
     useEffect(() => {
@@ -97,9 +89,14 @@ export default function Dashboard() {
             setFilteredWeb(filteredWebsites);
         }, 500)
 
-        clearTimeout(delayDebounseFn);
+        return () => clearTimeout(delayDebounseFn);
     }, [search, websites]);
 
+    async function refreshMonitors() {
+        setRefreshing(true);
+        await fetchWebs(true);
+        setRefreshing(false);
+    }
 
     return (
         <div className="min-h-screen bg-background">
@@ -132,7 +129,7 @@ export default function Dashboard() {
                             variant="ghost"
                             size="icon"
                             className="text-muted-foreground hover:text-foreground h-9 w-9"
-                            onClick={() => {}}
+                            onClick={refreshMonitors}
                             disabled={refreshing}
                         >
                             <RefreshCw className={`w-4 h-4 ${refreshing ? 'animate-spin' : ''}`} />
@@ -192,8 +189,7 @@ export default function Dashboard() {
                                 />
                             </div>
                             <p className="text-xs text-muted-foreground ml-auto">
-                                {/*{filtered.length} of {monitors.length}*/}
-                                {1} of {websites.length}
+                                {filteredWeb.length} of {websites.length}
                             </p>
                         </div>
 
@@ -219,32 +215,6 @@ export default function Dashboard() {
                 open={modalOpen}
                 onClose={() => setModalOpen(false)}
             />
-
-            {/* Delete confirmation */}
-            {/*<AlertDialog open={!!deleteTarget} onOpenChange={(o) => !o && setDeleteTarget(null)}>
-                <AlertDialogContent className="bg-card border-border text-foreground">
-                    <AlertDialogHeader>
-                        <AlertDialogTitle>Delete monitor?</AlertDialogTitle>
-                        <AlertDialogDescription className="text-muted-foreground">
-                            This will permanently delete{' '}
-                            <span className="text-foreground font-medium">{deleteTarget?.name}</span> and all its data.
-                            This action cannot be undone.
-                        </AlertDialogDescription>
-                    </AlertDialogHeader>
-                    <AlertDialogFooter>
-                        <AlertDialogCancel className="bg-transparent border-border text-muted-foreground hover:text-foreground hover:bg-secondary/50">
-                            Cancel
-                        </AlertDialogCancel>
-                        <AlertDialogAction
-                            className="bg-destructive hover:bg-destructive/90 text-destructive-foreground border-0"
-                            onClick={() => {}}
-                            disabled={deleting}
-                        >
-                            {deleting ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Delete'}
-                        </AlertDialogAction>
-                    </AlertDialogFooter>
-                </AlertDialogContent>
-            </AlertDialog>*/}
         </div>
     );
 }

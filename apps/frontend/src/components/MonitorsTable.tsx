@@ -16,7 +16,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import StatusBadge from './StatusBadge';
 import type { MonitorWebsite } from '@/types/monitor';
-import { Activity, ExternalLink, MoreHorizontal, Pause, Play, Trash2 } from 'lucide-react';
+import { Activity, ExternalLink, MoreHorizontal, Trash2 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 interface MonitorsTableProps {
@@ -25,28 +25,8 @@ interface MonitorsTableProps {
     onDeleteClick: (monitor: MonitorWebsite) => void;
 }
 
-//function formatInterval(seconds: number) {
-//    if (seconds < 60) return `${seconds}s`;
-//    if (seconds < 3600) return `${seconds / 60}m`;
-//    return `${seconds / 3600}h`;
-//}
-
-//function formatDistanceToNow(date: Date): string {
-//    const now = new Date();
-//    const diffInSeconds = Math.floor((now.getTime() - date.getTime()) / 1000);
-    
-//    if (diffInSeconds < 60) return 'just now';
-//    if (diffInSeconds < 3600) return `${Math.floor(diffInSeconds / 60)} minutes ago`;
-//    if (diffInSeconds < 86400) return `${Math.floor(diffInSeconds / 3600)} hours ago`;
-//    if (diffInSeconds < 604800) return `${Math.floor(diffInSeconds / 86400)} days ago`;
-//    return date.toLocaleDateString();
-//}
-
-
-
 export default function MonitorsTable({
     filteredMonitors,
-    onTogglePause,
     onDeleteClick,
 }: MonitorsTableProps) {
     const navigate = useNavigate();
@@ -74,13 +54,9 @@ export default function MonitorsTable({
                         <TableHead className="text-muted-foreground font-medium pl-5">URL</TableHead>
                         <TableHead className="text-muted-foreground font-medium">Region</TableHead>
                         <TableHead className="text-muted-foreground font-medium">Status</TableHead>
-                        <TableHead className="text-muted-foreground font-medium">
-                            Response
-                        </TableHead>
+                        <TableHead className="text-muted-foreground font-medium">Response</TableHead>
                         <TableHead className="text-muted-foreground font-medium">Last Check</TableHead>
-                        <TableHead className="text-muted-foreground font-medium">
-                            Time added
-                        </TableHead>
+                        <TableHead className="text-muted-foreground font-medium">Time added</TableHead>
                     </TableRow>
                 </TableHeader>
 
