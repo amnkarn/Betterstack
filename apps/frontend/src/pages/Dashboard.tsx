@@ -45,14 +45,14 @@ export default function Dashboard() {
         try {
             const res = await fetchWebsites();
             console.log(res);
-            //@ts-ignore
             setWebsites(res.map((w: any) => ({
                 id: w.id,
                 url: w.url,
-                status: w.ticks[0] ? (w.ticks[0].status === "Up" ? "Up" : "Down") : "checking",
+                status: w.ticks[0] ? (w.ticks[0].status === "Up" ? "Up" : "Down") : "Unknown",
                 responseTime: w.ticks[0] ? w.ticks[0].response_time_ms : 0,
-                lastChecked: w.ticks[0] ? new Date(w.ticks[0].createdAt).toLocaleString() :
-                new Date().toLocaleString(),
+                lastChecked: 
+                    w.ticks[0] ? new Date(w.ticks[0].createdAt).toLocaleString() : new Date().toLocaleString(),
+                timeAdded: new Date(w.time_added).toLocaleString() || new Date().toLocaleString(),
                 region: w.ticks[0] ? w.ticks[0].region.name : "checking"
             })));
 

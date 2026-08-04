@@ -17,6 +17,7 @@ import {
 import StatusBadge from './StatusBadge';
 import type { MonitorWebsite } from '@/types/monitor';
 import { Activity, ExternalLink, MoreHorizontal, Pause, Play, Trash2 } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
 interface MonitorsTableProps {
     filteredMonitors: MonitorWebsite[];
@@ -48,6 +49,9 @@ export default function MonitorsTable({
     onTogglePause,
     onDeleteClick,
 }: MonitorsTableProps) {
+    const navigate = useNavigate();
+
+
     if (filteredMonitors.length === 0) {
         return (
             <div className="flex flex-col items-center justify-center py-20 text-center">
@@ -73,31 +77,34 @@ export default function MonitorsTable({
                         <TableHead className="text-muted-foreground font-medium">
                             Response
                         </TableHead>
-                        <TableHead className="text-muted-foreground font-medium">Uptime</TableHead>
+                        <TableHead className="text-muted-foreground font-medium">Last Check</TableHead>
                         <TableHead className="text-muted-foreground font-medium">
                             Time added
                         </TableHead>
                     </TableRow>
                 </TableHeader>
+
                 <TableBody>
                     {filteredMonitors.map((monitor) => (
                         <TableRow
                             key={monitor.id}
                             className="group hover:bg-secondary/20 border-border"
                         >
-                            <TableCell className="pl-5 font-medium text-foreground py-4">
-                                {monitor.url}
-                            </TableCell>
                             <TableCell>
                                 <a
                                     href={monitor.url}
                                     target="_blank"
                                     rel="noopener noreferrer"
-                                    className="flex items-center gap-1.5 text-primary hover:text-primary/80 transition-colors text-sm font-mono max-w-[200px] truncate"
+                                    className="flex items-center gap-1.5 text-primary hover:text-primary/80 transition-colors text-sm font-mono max-w-50 truncate"
                                 >
                                     {monitor.url.replace(/^https?:\/\//, '')}
                                     <ExternalLink className="w-3 h-3 shrink-0" />
                                 </a>
+                            </TableCell>
+                            <TableCell>
+                                <p className='text-primary hover:text-primary/80 transition-colors text-sm font-mono truncate'>
+                                    {monitor.region === "checking" ? "checking..." : monitor.region }
+                                </p>
                             </TableCell>
                             <TableCell>
                                 <StatusBadge status={monitor.status} />
@@ -119,25 +126,19 @@ export default function MonitorsTable({
                                     <span className="text-muted-foreground/50">—</span>
                                 )}
                             </TableCell>
-                            {/*<TableCell>
-                                <span
-                                    className={`text-sm font-mono ${Number(monitor.uptime_percentage) >= 99.9
-                                        ? 'text-emerald-400'
-                                        : Number(monitor.uptime_percentage) >= 95
-                                            ? 'text-amber-400'
-                                            : 'text-red-400'
-                                        }`}
-                                >
-                                    {Number(monitor.uptime_percentage).toFixed(2)}%
+                            <TableCell>
+                                <span className="text-sm font-mono">
+                                    {monitor.lastChecked}
                                 </span>
                             </TableCell>
                             <TableCell>
-                                <div className="flex items-center gap-1 text-muted-foreground text-sm">
-                                    <Clock className="w-3.5 h-3.5" />
-                                    {formatInterval(monitor.check_interval)}
-                                </div>
-                            </TableCell>*/}
+                                <span className="text-sm font-mono">
+                                    {monitor.timeAdded}
+                                </span>
+                            </TableCell>
                             
+
+                            {/* Monitor options */}
                             <TableCell className="pr-5 text-right">
                                 <DropdownMenu>
                                     <DropdownMenuTrigger asChild>
@@ -155,28 +156,10 @@ export default function MonitorsTable({
                                     >
                                         <DropdownMenuItem
                                             className="gap-2 cursor-pointer hover:bg-secondary focus:bg-secondary"
-                                            onClick={() =>
-                                                window.open(monitor.url, '_blank', 'noopener,noreferrer')
-                                            }
+                                            onClick={() => navigate("/asdf")}
                                         >
                                             <ExternalLink className="w-4 h-4 text-muted-foreground" />
-                                            Visit URL
-                                        </DropdownMenuItem>
-                                        <DropdownMenuItem
-                                            className="gap-2 cursor-pointer hover:bg-secondary/50 focus:bg-secondary/50"
-                                            onClick={() => onTogglePause(monitor)}
-                                        >
-                                            {monitor.status === 'Unknown' ? (
-                                                <>
-                                                    <Play className="w-4 h-4 text-emerald-400" />
-                                                    Resume
-                                                </>
-                                            ) : (
-                                                <>
-                                                    <Pause className="w-4 h-4 text-amber-400" />
-                                                    Pause
-                                                </>
-                                            )}
+                                            View Analytics
                                         </DropdownMenuItem>
                                         <DropdownMenuSeparator className="bg-border" />
                                         <DropdownMenuItem

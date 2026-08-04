@@ -7,5 +7,5 @@ export interface MonitorWebsite {
     responseTime: number | null;
     lastChecked: number;
     region: string;
-    time_added: string;
+    timeAdded: number;
 }

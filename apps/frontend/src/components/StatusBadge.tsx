@@ -25,7 +25,7 @@ export default function StatusBadge({ status }: StatusBadgeProps) {
         },
     };
 
-    const cfg = map[status];
+    const cfg = map[status] || map.Unknown;
     return (
         <Badge
             variant="outline"
