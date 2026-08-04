@@ -2,8 +2,9 @@ import { xAckBulk, xReadGroup } from "@repo/redis/client";
 import axios from "axios";
 import prismaClient from "@repo/db/client";
 
-const REGION_ID = process.env.REGION_ID!;
-const WORKER_ID = process.env.WORKER_ID!;
+const REGION_ID = process.env.REGION_ID || "3d9b2acf-f03f-4895-97c3-ce03fb2d3cb3";
+const WORKER_ID = process.env.WORKER_ID || "1";
+
 
 if(!REGION_ID || !WORKER_ID) {
     throw new Error("REGION_ID or WORKER_ID is missing");

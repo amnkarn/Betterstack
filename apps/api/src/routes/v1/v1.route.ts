@@ -15,6 +15,17 @@ v1Route.get("/websites", authMiddleware, async (req, res) => {
         const websites = await prismaClient.website.findMany({
             where: {
                 user_id: (req as any).userId,
+            },
+            include: {
+                ticks: {
+                    include: {
+                        region: true
+                    },
+                    orderBy: [{
+                        createdAt: "desc"
+                    }],
+                    take: 1
+                }
             }
         })
         

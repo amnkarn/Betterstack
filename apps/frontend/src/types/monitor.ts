@@ -1,13 +1,11 @@
-export type MonitorStatus = 'up' | 'down' | 'paused' | 'unknown';
+export type WebsiteStatus = 'Up' | 'Down' | 'Unknown';
 
-export interface Monitor {
+export interface MonitorWebsite {
     id: string;
-    name: string;
     url: string;
-    status: MonitorStatus;
-    response_time: number | null;
-    uptime_percentage: number;
-    check_interval: number;
-    last_checked: string | null;
-    created_at: string;
+    status: WebsiteStatus;
+    responseTime: number | null;
+    lastChecked: number;
+    region: string;
+    time_added: string;
 }

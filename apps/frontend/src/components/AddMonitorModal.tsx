@@ -11,54 +11,33 @@ import {
     AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
 import { Loader2 } from 'lucide-react';
-import type { Monitor } from '@/types/monitor';
 
 interface AddMonitorModalProps {
     open: boolean;
     onClose: () => void;
-    onCreated: (monitor: Monitor) => void;
 }
 
 const intervalOptions = [
     { label: '1 minute', value: 60 },
-    { label: '5 minutes', value: 300 },
+    { label: '3 minutes', value: 180 },
     { label: '10 minutes', value: 600 },
     { label: '15 minutes', value: 900 },
     { label: '30 minutes', value: 1800 },
     { label: '1 hour', value: 3600 },
 ];
 
-export default function AddMonitorModal({ open, onClose, onCreated }: AddMonitorModalProps) {
-    const [name, setName] = useState('');
+export default function AddMonitorModal({ open, onClose }: AddMonitorModalProps) {
     const [url, setUrl] = useState('');
     const [interval, setInterval] = useState(60);
     const [loading, setLoading] = useState(false);
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        if (!name || !url || !interval) return;
+        if (!url || !interval) return;
 
         setLoading(true);
-
-        // Simulate API call
-        await new Promise(resolve => setTimeout(resolve, 500));
-
-        const newMonitor: Monitor = {
-            id: Date.now().toString(),
-            name,
-            url,
-            status: 'unknown',
-            response_time: null,
-            uptime_percentage: 100,
-            check_interval: interval,
-            last_checked: null,
-            created_at: new Date().toISOString(),
-        };
-
-        onCreated(newMonitor);
-
+        
         // Reset form
-        setName('');
         setUrl('');
         setInterval(60);
         setLoading(false);
@@ -75,18 +54,7 @@ export default function AddMonitorModal({ open, onClose, onCreated }: AddMonitor
                     </AlertDialogDescription>
                 </AlertDialogHeader>
 
-                <form onSubmit={handleSubmit} className="space-y-4">
-                    <div>
-                        <label className="text-sm font-medium text-foreground mb-1 block">Name</label>
-                        <Input
-                            placeholder="e.g., Production API"
-                            value={name}
-                            onChange={(e) => setName(e.target.value)}
-                            className="bg-background border-border text-foreground placeholder:text-muted-foreground focus-visible:ring-primary/50"
-                            required
-                        />
-                    </div>
-
+                <form onSubmit={handleSubmit} className="space-y-10">
                     <div>
                         <label className="text-sm font-medium text-foreground mb-1 block">URL</label>
                         <Input

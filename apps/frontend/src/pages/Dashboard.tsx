@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import {
@@ -21,98 +21,95 @@ import {
     TrendingUp,
     Loader2,
 } from 'lucide-react';
-import type { Monitor, MonitorStatus } from '@/types/monitor';
+import type { MonitorWebsite } from '@/types/monitor';
 import AddMonitorModal from '@/components/AddMonitorModal';
 import DashboardSidebar from '@/components/DashboardSidebar';
 import StatCard from '@/components/StatCard';
 import MonitorsTable from '@/components/MonitorsTable';
 import ThemeToggle from '@/components/ThemeToggle';
-import { mockApi } from '@/lib/mockApi';
+import { fetchWebsites } from '@/api/homeApi';
+import { useNavigate } from 'react-router-dom';
+//--------------------------------------------------------------
 
-interface Props {
-    onBack: () => void;
-}
 
-export default function Dashboard({ onBack }: Props) {
-    const [monitors, setMonitors] = useState<Monitor[]>([]);
-    const [loading, setLoading] = useState(true);
-    const [search, setSearch] = useState('');
+export default function Dashboard() {
+    const navigate = useNavigate();
+    const [websites, setWebsites] = useState<MonitorWebsite[]>([]);
     const [modalOpen, setModalOpen] = useState(false);
-    const [deleteTarget, setDeleteTarget] = useState<Monitor | null>(null);
-    const [deleting, setDeleting] = useState(false);
-    const [refreshing, setRefreshing] = useState(false);
+    const [refreshing, setRefreshing] = useState(false);// used for top bar refreshh icon
+    const [loading, setLoading] = useState(false); // for loader
+    const [filteredWeb, setFilteredWeb] = useState<MonitorWebsite[]>([]);
 
-    const fetchMonitors = useCallback(async (quiet = false) => {
-        if (!quiet) setLoading(true);
-        else setRefreshing(true);
 
+    const fetchWebs = async () => {
         try {
-            const data = await mockApi.getMonitors();
-            setMonitors(data);
+            const res = await fetchWebsites();
+            console.log(res);
+            //@ts-ignore
+            setWebsites(res.map((w: any) => ({
+                id: w.id,
+                url: w.url,
+                status: w.ticks[0] ? (w.ticks[0].status === "Up" ? "Up" : "Down") : "checking",
+                response_time: w.ticks[0] ? w.ticks[0].response_time_ms : 0,
+                lastChecked: w.ticks[0] ? new Date(w.ticks[0].createdAt).toLocaleString() :
+                new Date().toLocaleString(),
+                region: w.ticks[0] ? w.ticks[0].region.name : "checking"
+            })));
+
         } catch (error) {
-            console.error('Failed to fetch monitors:', error);
-        } finally {
-            setLoading(false);
-            setRefreshing(false);
+            console.log(error);
         }
-    }, []);
+    }
 
     useEffect(() => {
-        fetchMonitors();
-    }, [fetchMonitors]);
+        fetchWebs(); //initial fetch
 
-    async function togglePause(monitor: Monitor) {
-        const newStatus: MonitorStatus = monitor.status === 'paused' ? 'unknown' : 'paused';
-        try {
-            const updated = await mockApi.updateMonitorStatus(monitor.id, newStatus);
-            if (updated) {
-                setMonitors((prev) => prev.map((m) => (m.id === monitor.id ? updated : m)));
-            }
-        } catch (error) {
-            console.error('Failed to toggle pause:', error);
-        }
-    }
+        const interval = setInterval(async () => {
+            await fetchWebs();
+        }, 30000)
 
-    async function deleteMonitor() {
-        if (!deleteTarget) return;
-        setDeleting(true);
-        try {
-            await mockApi.deleteMonitor(deleteTarget.id);
-            setMonitors((prev) => prev.filter((m) => m.id !== deleteTarget.id));
-            setDeleteTarget(null);
-        } catch (error) {
-            console.error('Failed to delete monitor:', error);
-        } finally {
-            setDeleting(false);
-        }
-    }
+        clearInterval(interval);
+    }, [])
 
-    const filtered = monitors.filter(
-        (m) =>
-            m.name.toLowerCase().includes(search.toLowerCase()) ||
-            m.url.toLowerCase().includes(search.toLowerCase()),
-    );
+    const upCount = websites.filter((m) => m.status === "Up").length;
+    const downCount = websites.filter((m) => m.status === "Down").length;
+    //const avgUptime =
+    //    websites.length > 0
+    //        ? (monitors.reduce((a, m) => a + Number(m.uptime_percentage), 0) / monitors.length).toFixed(2)
+    //        : '—';
 
-    const upCount = monitors.filter((m) => m.status === 'up').length;
-    const downCount = monitors.filter((m) => m.status === 'down').length;
-    const avgUptime =
-        monitors.length > 0
-            ? (monitors.reduce((a, m) => a + Number(m.uptime_percentage), 0) / monitors.length).toFixed(2)
-            : '—';
+    const [search, setSearch] = useState(''); //search the website
+
+    useEffect(() => {
+        if(!search.trim()) return;
+
+        const delayDebounseFn = setTimeout(() => {
+            //searching logic
+            const searchString = search.toLowerCase();
+            const filteredWebsites = websites.filter((m) => {
+                m.url.toLowerCase().includes(searchString)
+            })
+
+            console.log(filteredWebsites);
+
+        }, 500)
+
+        clearTimeout(delayDebounseFn);
+    }, [search]);
+
 
     return (
         <div className="min-h-screen bg-background">
-            {/* Sidebar */}
-            <DashboardSidebar onBack={onBack} />
+            <DashboardSidebar />
 
             {/* Main */}
             <main className="lg:pl-60">
                 {/* Top bar */}
                 <div className="sticky top-0 z-30 border-b border-border bg-background/80 backdrop-blur-lg px-6 py-4 flex items-center justify-between gap-4">
+                    {/* Mobile logo */}
                     <div className="flex items-center gap-3">
-                        {/* Mobile logo */}
                         <button
-                            onClick={onBack}
+                            onClick={() => navigate("/")}
                             className="flex lg:hidden items-center gap-2 text-muted-foreground hover:text-foreground"
                         >
                             <Activity className="w-5 h-5 text-primary" />
@@ -121,18 +118,18 @@ export default function Dashboard({ onBack }: Props) {
                         <div className="hidden lg:block">
                             <h1 className="text-foreground font-semibold text-lg">Monitors</h1>
                             <p className="text-muted-foreground text-xs">
-                                {monitors.length} monitor{monitors.length !== 1 ? 's' : ''} tracked
+                                {websites.length} monitor{websites.length !== 1 ? 's' : ''} tracked
                             </p>
                         </div>
                     </div>
-
+                    {/* Right side icons and button */}
                     <div className="flex items-center gap-2">
                         <ThemeToggle />
                         <Button
                             variant="ghost"
                             size="icon"
                             className="text-muted-foreground hover:text-foreground h-9 w-9"
-                            onClick={() => fetchMonitors(true)}
+                            onClick={() => {}}
                             disabled={refreshing}
                         >
                             <RefreshCw className={`w-4 h-4 ${refreshing ? 'animate-spin' : ''}`} />
@@ -153,7 +150,7 @@ export default function Dashboard({ onBack }: Props) {
                     <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
                         <StatCard
                             label="Total monitors"
-                            value={monitors.length}
+                            value={websites.length}
                             icon={Activity}
                             color="bg-primary/10 text-primary"
                         />
@@ -171,7 +168,8 @@ export default function Dashboard({ onBack }: Props) {
                         />
                         <StatCard
                             label="Avg uptime"
-                            value={avgUptime === '—' ? '—' : `${avgUptime}%`}
+                            //value={avgUptime === '—' ? '—' : `${avgUptime}%`}
+                            value={"89%"}
                             icon={TrendingUp}
                             color="bg-violet-500/10 text-violet-400"
                         />
@@ -191,7 +189,8 @@ export default function Dashboard({ onBack }: Props) {
                                 />
                             </div>
                             <p className="text-xs text-muted-foreground ml-auto">
-                                {filtered.length} of {monitors.length}
+                                {/*{filtered.length} of {monitors.length}*/}
+                                {1} of {websites.length}
                             </p>
                         </div>
 
@@ -203,10 +202,10 @@ export default function Dashboard({ onBack }: Props) {
                             </div>
                         ) : (
                             <MonitorsTable
-                                monitors={monitors}
-                                filteredMonitors={filtered}
-                                onTogglePause={togglePause}
-                                onDeleteClick={setDeleteTarget}
+                                monitors={websites}
+                                filteredMonitors={filteredWeb}
+                                onTogglePause={() => {}}
+                                onDeleteClick={() => {}}
                             />
                         )}
                     </div>
@@ -217,11 +216,12 @@ export default function Dashboard({ onBack }: Props) {
             <AddMonitorModal
                 open={modalOpen}
                 onClose={() => setModalOpen(false)}
-                onCreated={(m) => setMonitors((prev) => [m, ...prev])}
+                onCreated={(m) => setWebsites((prev) => [m, ...prev])}
+                //url={url}
             />
 
             {/* Delete confirmation */}
-            <AlertDialog open={!!deleteTarget} onOpenChange={(o) => !o && setDeleteTarget(null)}>
+            {/*<AlertDialog open={!!deleteTarget} onOpenChange={(o) => !o && setDeleteTarget(null)}>
                 <AlertDialogContent className="bg-card border-border text-foreground">
                     <AlertDialogHeader>
                         <AlertDialogTitle>Delete monitor?</AlertDialogTitle>
@@ -237,14 +237,14 @@ export default function Dashboard({ onBack }: Props) {
                         </AlertDialogCancel>
                         <AlertDialogAction
                             className="bg-destructive hover:bg-destructive/90 text-destructive-foreground border-0"
-                            onClick={deleteMonitor}
+                            onClick={() => {}}
                             disabled={deleting}
                         >
                             {deleting ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Delete'}
                         </AlertDialogAction>
                     </AlertDialogFooter>
                 </AlertDialogContent>
-            </AlertDialog>
+            </AlertDialog>*/}
         </div>
     );
 }
