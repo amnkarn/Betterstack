@@ -2,8 +2,6 @@ import { useState } from 'react';
 import { Input } from '@/components/ui/Input';
 import {
     AlertDialog,
-    AlertDialogAction,
-    AlertDialogCancel,
     AlertDialogContent,
     AlertDialogDescription,
     AlertDialogFooter,
@@ -11,6 +9,8 @@ import {
     AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
 import { Loader2 } from 'lucide-react';
+import { addWebsite } from '@/api/homeApi';
+import { Button } from './ui/Button';
 
 interface AddMonitorModalProps {
     open: boolean;
@@ -36,7 +36,9 @@ export default function AddMonitorModal({ open, onClose }: AddMonitorModalProps)
         if (!url || !interval) return;
 
         setLoading(true);
-        
+        await addWebsite(url);
+        setLoading(false);
+
         // Reset form
         setUrl('');
         setInterval(60);
@@ -88,20 +90,20 @@ export default function AddMonitorModal({ open, onClose }: AddMonitorModalProps)
                     </div>
 
                     <AlertDialogFooter>
-                        <AlertDialogCancel
+                        <Button
                             className="bg-transparent border-border text-muted-foreground hover:text-foreground hover:bg-secondary/50"
                             type="button"
                             onClick={onClose}
                         >
                             Cancel
-                        </AlertDialogCancel>
-                        <AlertDialogAction
+                        </Button>
+                        <Button
                             className="bg-primary hover:bg-primary/90 text-primary-foreground border-0"
                             type="submit"
                             disabled={loading}
                         >
                             {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Add Monitor'}
-                        </AlertDialogAction>
+                        </Button>
                     </AlertDialogFooter>
                 </form>
             </AlertDialogContent>

@@ -35,10 +35,10 @@ import { useNavigate } from 'react-router-dom';
 export default function Dashboard() {
     const navigate = useNavigate();
     const [websites, setWebsites] = useState<MonitorWebsite[]>([]);
+    const [filteredWeb, setFilteredWeb] = useState<MonitorWebsite[]>([]); //filtered based on search
     const [modalOpen, setModalOpen] = useState(false);
     const [refreshing, setRefreshing] = useState(false);// used for top bar refreshh icon
     const [loading, setLoading] = useState(false); // for loader
-    const [filteredWeb, setFilteredWeb] = useState<MonitorWebsite[]>([]);
 
 
     const fetchWebs = async () => {
@@ -50,7 +50,7 @@ export default function Dashboard() {
                 id: w.id,
                 url: w.url,
                 status: w.ticks[0] ? (w.ticks[0].status === "Up" ? "Up" : "Down") : "checking",
-                response_time: w.ticks[0] ? w.ticks[0].response_time_ms : 0,
+                responseTime: w.ticks[0] ? w.ticks[0].response_time_ms : 0,
                 lastChecked: w.ticks[0] ? new Date(w.ticks[0].createdAt).toLocaleString() :
                 new Date().toLocaleString(),
                 region: w.ticks[0] ? w.ticks[0].region.name : "checking"
@@ -81,21 +81,24 @@ export default function Dashboard() {
     const [search, setSearch] = useState(''); //search the website
 
     useEffect(() => {
-        if(!search.trim()) return;
+        if(!search.trim()) {
+            setFilteredWeb(websites);
+            return;
+        }
 
         const delayDebounseFn = setTimeout(() => {
             //searching logic
             const searchString = search.toLowerCase();
             const filteredWebsites = websites.filter((m) => {
-                m.url.toLowerCase().includes(searchString)
+                return m.url.toLowerCase().includes(searchString)
             })
 
             console.log(filteredWebsites);
-
+            setFilteredWeb(filteredWebsites);
         }, 500)
 
         clearTimeout(delayDebounseFn);
-    }, [search]);
+    }, [search, websites]);
 
 
     return (
@@ -202,7 +205,6 @@ export default function Dashboard() {
                             </div>
                         ) : (
                             <MonitorsTable
-                                monitors={websites}
                                 filteredMonitors={filteredWeb}
                                 onTogglePause={() => {}}
                                 onDeleteClick={() => {}}
@@ -216,8 +218,6 @@ export default function Dashboard() {
             <AddMonitorModal
                 open={modalOpen}
                 onClose={() => setModalOpen(false)}
-                onCreated={(m) => setWebsites((prev) => [m, ...prev])}
-                //url={url}
             />
 
             {/* Delete confirmation */}

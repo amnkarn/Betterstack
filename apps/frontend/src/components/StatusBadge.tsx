@@ -1,29 +1,24 @@
-import { CheckCircle2, XCircle, Pause, AlertCircle } from 'lucide-react';
+import { CheckCircle2, XCircle, AlertCircle } from 'lucide-react';
 import { Badge } from './ui/Badge';
-import type { MonitorStatus } from '@/types/monitor';
+import type { WebsiteStatus } from '@/types/monitor';
 
 interface StatusBadgeProps {
-    status: MonitorStatus;
+    status: WebsiteStatus;
 }
 
 export default function StatusBadge({ status }: StatusBadgeProps) {
-    const map: Record<MonitorStatus, { label: string; icon: React.ReactNode; className: string }> = {
-        up: {
+    const map: Record<WebsiteStatus, { label: string; icon: React.ReactNode; className: string }> = {
+        Up: {
             label: 'Up',
             icon: <CheckCircle2 className="w-3 h-3" />,
             className: 'bg-emerald-500/15 text-emerald-400 border-emerald-500/30',
         },
-        down: {
+        Down: {
             label: 'Down',
             icon: <XCircle className="w-3 h-3" />,
             className: 'bg-red-500/15 text-red-400 border-red-500/30',
         },
-        paused: {
-            label: 'Paused',
-            icon: <Pause className="w-3 h-3" />,
-            className: 'bg-amber-500/15 text-amber-400 border-amber-500/30',
-        },
-        unknown: {
+        Unknown: {
             label: 'Checking…',
             icon: <AlertCircle className="w-3 h-3" />,
             className: 'bg-slate-500/15 text-slate-400 border-slate-500/30',
@@ -36,8 +31,8 @@ export default function StatusBadge({ status }: StatusBadgeProps) {
             variant="outline"
             className={`flex items-center gap-1 w-fit text-xs font-medium px-2 py-0.5 ${cfg.className}`}
         >
-            {status === 'up' && <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse mr-0.5" />}
-            {status === 'down' && <span className="w-1.5 h-1.5 rounded-full bg-red-400 mr-0.5" />}
+            {status === 'Up' && <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse mr-0.5" />}
+            {status === 'Down' && <span className="w-1.5 h-1.5 rounded-full bg-red-400 mr-0.5" />}
             {cfg.icon}
             {cfg.label}
         </Badge>
