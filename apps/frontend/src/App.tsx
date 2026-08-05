@@ -3,7 +3,7 @@ import LandingPage from "./pages/LandingPage";
 import Dashboard from "./pages/Dashboard";
 import Auth from "./pages/Auth";
 import type React from "react";
-//import MonitorPage from "./pages/MonitorPage";
+import MonitorPage from "./pages/MonitorPage";
 
 
 export function App() {
@@ -20,7 +20,7 @@ export function App() {
           </ProtectRouter>
         } />
 
-        {/*<Route path="/monitor/:websiteId" element={<MonitorPage />} />*/}
+        <Route path="/monitor/:websiteId" element={<MonitorPage />} />
 
       </Routes>
     </BrowserRouter>

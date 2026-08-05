@@ -1,7 +1,7 @@
 import { Router, type Request, type Response } from "express";
 import authMiddleware from "../../middleware/authMiddleware";
 import prismaClient from "@repo/db/client";
-import { CreateWebsiteInput, DeleteWebParams } from "../../validator";
+import { CreateWebsiteInput, DeleteWebParams, GetWebParams } from "../../validator";
 
 
 const websiteRouter: Router = Router();
@@ -82,6 +82,43 @@ websiteRouter.delete("/:websiteId", authMiddleware, async (req: Request, res: Re
         console.log("Error in deleting", error);
         res.status(500).json({
             message: "Something went wrong"
+        })
+    }
+})
+
+websiteRouter.get("/:websiteId", authMiddleware, async (req: Request, res: Response) => {
+    const parseParams = GetWebParams.safeParse(req.params);
+    if(!parseParams.success) {
+        return res.status(400).json({
+            message: "invalid web id"
+        })
+    }
+    const userId = (req as any).userId;
+    
+    try {
+        const web = await prismaClient.website.findFirst({
+            where: {
+                id: parseParams.data.websiteId,
+                user_id: userId
+            }, 
+            include: {
+                
+                ticks: true
+            }
+        })
+        
+        if(!web) {
+            return res.status(400).json({
+                message: "Something went wrong"
+            })
+        }
+
+        return res.status(200).json(web);
+        
+    } catch (error) {
+        console.log("Error in fetching web", error);
+        res.status(500).json({
+            message: "Something went wrong",
         })
     }
 })

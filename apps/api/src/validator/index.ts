@@ -12,3 +12,7 @@ export const CreateWebsiteInput = z.object({
 export const DeleteWebParams = z.object({
     websiteId: z.string().uuid({ message: "Invalid website ID format. Must be a valid UUID." })
 })
+
+export const GetWebParams = z.object({
+    websiteId: z.string().uuid({ message: "Invalid website ID format. Must be a valid UUID." })
+})

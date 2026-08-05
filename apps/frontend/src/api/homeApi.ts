@@ -28,3 +28,11 @@ export async function deleteWebsite(id: string) {
     });
     console.log(res);
 }
+
+export async function fetchWebsite(id: string) {
+    const res = await axios.get(`${BASE_URL}/api/v1/website/${id}`, {
+        withCredentials: true
+    })
+
+    console.log(res);
+}
