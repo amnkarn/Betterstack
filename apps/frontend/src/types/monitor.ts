@@ -9,13 +9,22 @@ export interface MonitorWebsite {
     region: string;
     timeAdded: number;
 }
+//------------------------------
+//-----Monitor page types-------
 
+export interface MonitorTick {
+    id: string;
+    response_time_ms: number;
+    status: WebsiteStatus;
+    region_id: string;
+    website_id: string;
+    createdAt: string;
+}
 
-export interface MonitorCheck {
-  id: string;
-  monitor_id: string;
-  status: 'Up' | 'Down';
-  response_time: number | null;
-  error_message: string | null;
-  checked_at: string;
+export interface MonitorResponse {
+    id: string;
+    url: string;
+    user_id: string;
+    time_added: string;
+    ticks: MonitorTick[];
 }

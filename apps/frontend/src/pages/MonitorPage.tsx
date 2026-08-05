@@ -11,26 +11,12 @@ import {
     ReferenceLine,
 } from 'recharts';
 import { format } from 'date-fns';
-import { type MonitorWebsite } from '@/types/monitor';
-import { type MonitorCheck } from '@/types/monitor';
-import { Button } from '@/components/ui/Button';
-import {
-    ArrowLeft,
-    ExternalLink,
-    RefreshCw,
-    Loader2,
-    Activity,
-    Database,
-} from 'lucide-react';
+import { Loader2 } from 'lucide-react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { fetchWebsite } from '@/api/homeApi';
-
+import { type MonitorResponse, type MonitorTick } from '@/types/monitor';
+import { PageShell } from '@/components/MonitorPage/PageShell';
 // ─── Types ───────────────────────────────────────────────────────────────────
-
-interface Props {
-    monitor: Monitor;
-    onBack: () => void;
-}
 
 type TimeRange = '24H' | '7D' | '30D' | '90D';
 
@@ -184,7 +170,7 @@ function StatBox({
             ? 'text-emerald-400'
             : tone === 'red'
                 ? 'text-red-400'
-                : 'text-white';
+                : 'text-foreground';
 
     return (
         <div className="bg-card border border-border rounded-lg px-5 py-4">
@@ -197,7 +183,7 @@ function StatBox({
     );
 }
 
-function ChartTooltip({ active, payload, label }: any) {
+function ChartTooltip({ active, payload }: any) {
     if (!active || !payload?.length) return null;
     const d = payload[0]?.payload as ChartPoint;
     if (!d) return null;
@@ -205,7 +191,7 @@ function ChartTooltip({ active, payload, label }: any) {
         <div className="bg-card border border-border rounded-lg px-3 py-2.5 text-xs shadow-xl">
             <p className="text-muted-foreground mb-1.5">{d.label}</p>
             {d.avgResponse != null ? (
-                <p className="text-white font-mono">
+                <p className="text-foreground font-mono">
                     Response: <span className="text-sky-400">{d.avgResponse} ms</span>
                 </p>
             ) : (
@@ -253,7 +239,7 @@ function UptimeBar({ bars }: { bars: DayBar[] }) {
                     className="absolute bottom-10 bg-card border border-border rounded-lg px-3 py-2 text-xs shadow-xl whitespace-nowrap pointer-events-none z-10"
                     style={{ left: '50%', transform: 'translateX(-50%)' }}
                 >
-                    <p className="text-white font-medium">{hovered.label}</p>
+                    <p className="text-foreground font-medium">{hovered.label}</p>
                     {hovered.hasData ? (
                         <p className="text-muted-foreground mt-0.5">
                             {hovered.uptimePct.toFixed(2)}% uptime &middot; {hovered.total} checks
@@ -289,41 +275,33 @@ export default function MonitorPage() {
     const navigate = useNavigate();
     const params = useParams();
     const websiteId = (params.websiteId as string);
+    const [refreshing, setRefreshing] = useState<boolean>(false);
+    const [monitor, setMonitor] = useState<MonitorResponse | null>();
 
-    const [monitor, setMonitor] = useState([]);
 
-
+    const [allChecks, setAllChecks] = useState<MonitorCheck[]>([]); //
 
 
     const [checks, setChecks] = useState<MonitorCheck[]>([]);
-    const [allChecks, setAllChecks] = useState<MonitorCheck[]>([]);
-    const [loading, setLoading] = useState(true);
-    const [seeding, setSeeding] = useState(false);
-    const [range, setRange] = useState<TimeRange>('7D');
+    const [loading, setLoading] = useState(false);
+    const [range, setRange] = useState<TimeRange>('24H');
 
 
     // Filter checks to selected time range
-    //  useEffect(() => {
-    //    const hoursMap: Record<TimeRange, number> = {
-    //      '24H': 24,
-    //      '7D': 168,
-    //      '30D': 720,
-    //      '90D': 2160,
-    //    };
-    //    const cutoff = subHours(new Date(), hoursMap[range]);
-    //    setChecks(allChecks.filter((c) => new Date(c.checked_at) >= cutoff));
-    //  }, [allChecks, range]);
+    useEffect(() => {
+        const hoursMap: Record<TimeRange, number> = {
+            '24H': 24,
+            '7D': 168,
+            '30D': 720,
+            '90D': 2160,
+        };
+        const now = Date.now();
+        const cutoff = now - hoursMap[range] * 60 * 60 * 1000;
 
-    //  async function handleSeed() {
-    //    setSeeding(true);
-    //    try {
-    //      await insertSeedChecks(monitor.id);
-    //      await () => {}();
-    //    } catch (e) {
-    //      console.error(e);
-    //    }
-    //    setSeeding(false);
-    //  }
+        setChecks(allChecks.filter((c) => { 
+            new Date(c.checked_at).getTime() >= cutoff
+        }));
+    }, [allChecks, range]);
 
     // Derived stats
     const chartPoints = useMemo(
@@ -334,8 +312,8 @@ export default function MonitorPage() {
     const dayBars = useMemo(() => buildDayBars(allChecks), [allChecks]);
     const incidents = useMemo(() => detectIncidents(checks), [checks]);
 
-    const upChecks = checks.filter((c) => c.status === 'up');
-    const downChecks = checks.filter((c) => c.status === 'down');
+    const upChecks = checks.filter((c) => c.status === 'Up');
+    const downChecks = checks.filter((c) => c.status === 'Down');
     const responseTimes = upChecks.map((c) => c.response_time!).filter((r) => r != null);
     const avgResponse = responseTimes.length
         ? Math.round(responseTimes.reduce((a, b) => a + b, 0) / responseTimes.length)
@@ -365,19 +343,46 @@ export default function MonitorPage() {
     const hasChecks = allChecks.length > 0;
 
     async function fetchWeb() {
-        const res = await fetchWebsite(websiteId);
-        console.log(res);
-        setMonitor(res.data)
+        try {
+            setLoading(true);
+            const res = await fetchWebsite(websiteId);
+            console.log(res);
+            if(res) {
+                setMonitor(res);
+            }
+
+            const mappedChecks = (res.ticks || [])
+                .map((t: MonitorTick) => ({
+                    id: t.id,
+                    monitor_id: t.website_id,
+                    status: t.status.toLowerCase(),
+                    response_time: t.response_time_ms,
+                    error_message: null,
+                    checked_at: t.createdAt
+                }));
+
+            setAllChecks(mappedChecks);
+
+        } catch (error) {
+            console.log("Failed to fetch website: ", error);
+        } finally {
+            setLoading(false);
+        }
     }
 
     useEffect(() => {
         fetchWeb();
-    })
+    }, [websiteId])
 
+    async function refreshMonitor() {
+        setRefreshing(true);
+        await fetchWeb();
+        setRefreshing(false);
+    }
 
     if (loading) {
         return (
-            <PageShell monitor={monitor} onBack={() => navigate("/home")} onRefresh={() => { }} refreshing={false}>
+            <PageShell monitor={monitor} onBack={() => navigate("/home")} onRefresh={refreshMonitor} refreshing={refreshing}>
                 <div className="flex items-center justify-center h-64">
                     <Loader2 className="w-6 h-6 text-muted-foreground animate-spin" />
                 </div>
@@ -385,40 +390,9 @@ export default function MonitorPage() {
         );
     }
 
-    if (!hasChecks) {
-        return (
-            <PageShell monitor={monitor} onBack={() => navigate("/home")} onRefresh={() => { }} refreshing={false}>
-                <div className="flex flex-col items-center justify-center h-80 gap-4 border border-border rounded-lg bg-card">
-                    <Activity className="w-8 h-8 text-muted-foreground/40" />
-                    <div className="text-center">
-                        <p className="text-white font-medium mb-1">No check data yet</p>
-                        <p className="text-muted-foreground text-sm max-w-sm">
-                            Data appears here once your monitor starts running checks. Load sample data to
-                            preview the analytics.
-                        </p>
-                    </div>
-                    <Button
-                        size="sm"
-                        variant="outline"
-                        className="border-border text-muted-foreground hover:text-white gap-2 mt-1"
-                        onClick={handleSeed}
-                        disabled={seeding}
-                    >
-                        {seeding ? (
-                            <Loader2 className="w-4 h-4 animate-spin" />
-                        ) : (
-                            <Database className="w-4 h-4" />
-                        )}
-                        {seeding ? 'Generating 90 days of data…' : 'Load sample data'}
-                    </Button>
-                </div>
-            </PageShell>
-        );
-    }
-
 
     return (
-        <PageShell monitor={monitor} onBack={() => navigate("/home")} onRefresh={() => { }} refreshing={false}>
+        <PageShell monitor={monitor} onBack={() => navigate("/home")} onRefresh={refreshMonitor} refreshing={refreshing}>
             {/* Time range */}
             <div className="flex items-center gap-1 border border-border rounded-lg p-1 w-fit bg-card">
                 {TIME_RANGES.map(({ label }) => (
@@ -426,8 +400,8 @@ export default function MonitorPage() {
                         key={label}
                         onClick={() => setRange(label)}
                         className={`px-4 py-1.5 rounded-md text-sm font-medium transition-colors ${range === label
-                            ? 'bg-background text-white'
-                            : 'text-muted-foreground hover:text-white'
+                            ? 'bg-background text-foreground shadow-sm'
+                            : 'text-muted-foreground hover:text-foreground'
                             }`}
                     >
                         {label}
@@ -491,7 +465,7 @@ export default function MonitorPage() {
             {/* Response time chart */}
             <div className="border border-border rounded-lg bg-card">
                 <div className="px-5 py-4 border-b border-border">
-                    <p className="text-sm font-medium text-white">Response time</p>
+                    <p className="text-sm font-medium text-foreground">Response time</p>
                     <p className="text-xs text-muted-foreground mt-0.5">
                         Average per bucket &middot; red areas indicate downtime
                     </p>
@@ -505,7 +479,7 @@ export default function MonitorPage() {
                                     <stop offset="100%" stopColor="#38bdf8" stopOpacity={0} />
                                 </linearGradient>
                             </defs>
-                            <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" vertical={false} />
+                            <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--foreground))" strokeOpacity={0.1} vertical={false} />
                             <XAxis
                                 dataKey="timestamp"
                                 type="number"
@@ -525,7 +499,7 @@ export default function MonitorPage() {
                                 unit=" ms"
                                 width={52}
                             />
-                            <Tooltip content={<ChartTooltip />} cursor={{ stroke: 'rgba(255,255,255,0.1)', strokeWidth: 1 }} />
+                            <Tooltip content={<ChartTooltip />} cursor={{ stroke: 'hsl(var(--foreground))', strokeOpacity: 0.1, strokeWidth: 1 }} />
                             {/* Avg response reference line */}
                             {avgResponse && (
                                 <ReferenceLine
@@ -563,7 +537,7 @@ export default function MonitorPage() {
 
             {/* 90-day uptime history */}
             <div className="border border-border rounded-lg bg-card px-5 py-4">
-                <p className="text-sm font-medium text-white mb-1">Uptime history</p>
+                <p className="text-sm font-medium text-foreground mb-1">Uptime history</p>
                 <p className="text-xs text-muted-foreground mb-4">Past 90 days</p>
                 <UptimeBar bars={dayBars} />
             </div>
@@ -572,7 +546,7 @@ export default function MonitorPage() {
             {/*<div className="border border-border rounded-lg bg-card">
                 <div className="px-5 py-4 border-b border-border flex items-center justify-between">
                     <div>
-                        <p className="text-sm font-medium text-white">Incidents</p>
+                        <p className="text-sm font-medium text-foreground">Incidents</p>
                         <p className="text-xs text-muted-foreground mt-0.5">Downtime events in {range}</p>
                     </div>
                     <span className="text-xs font-mono text-muted-foreground">
@@ -597,8 +571,8 @@ export default function MonitorPage() {
                         </TableHeader>
                         <TableBody>
                             {incidents.map((inc, i) => (
-                                <TableRow key={i} className="border-border hover:bg-white/[0.015]">
-                                    <TableCell className="pl-5 text-sm text-white font-mono py-3">
+                                <TableRow key={i} className="border-border hover:bg-accent/50">
+                                    <TableCell className="pl-5 text-sm text-foreground font-mono py-3">
                                         {format(inc.start, 'MMM d, HH:mm')}
                                     </TableCell>
                                     <TableCell className="text-sm text-muted-foreground font-mono">
@@ -625,98 +599,6 @@ export default function MonitorPage() {
                     </Table>
                 )}
             </div>*/}
-        </PageShell>
-    );
-}
-
-// ─── Page shell (header + sidebar layout) ────────────────────────────────────
-
-function PageShell({
-    monitor,
-    onBack,
-    onRefresh,
-    refreshing,
-    children,
-}: {
-    monitor: Monitor;
-    onBack: () => void;
-    onRefresh: () => void;
-    refreshing: boolean;
-    children: React.ReactNode;
-}) {
-    const statusDot =
-        monitor.status === 'up'
-            ? 'bg-emerald-400'
-            : monitor.status === 'down'
-                ? 'bg-red-400'
-                : 'bg-slate-400';
-
-    return (
-        <div className="min-h-screen bg-background">
-            {/* Sidebar */}
-            <aside className="fixed top-0 left-0 bottom-0 w-60 border-r border-border bg-card/60 backdrop-blur-sm hidden lg:flex flex-col z-40">
-                <div className="px-5 py-5 border-b border-border">
-                    <button onClick={() => navigate("/home")} className="flex items-center gap-2 group w-full">
-                        <div className="w-8 h-8 rounded-lg bg-sky-500 flex items-center justify-center group-hover:scale-110 transition-transform shrink-0">
-                            <Activity className="w-4 h-4 text-white" />
-                        </div>
-                        <span className="font-bold text-white text-base">PulseWatch</span>
-                    </button>
-                </div>
-                <nav className="flex-1 px-3 py-4 space-y-1">
-                    <button
-                        onClick={() => navigate("/home")}
-                        className="flex items-center gap-2.5 px-3 py-2 w-full rounded-lg text-sm text-muted-foreground hover:text-white hover:bg-white/5 transition-colors"
-                    >
-                        <Activity className="w-4 h-4" />
-                        Monitors
-                    </button>
-                </nav>
-            </aside>
-
-            <main className="lg:pl-60">
-                {/* Top bar */}
-                <div className="sticky top-0 z-30 border-b border-border bg-background/80 backdrop-blur-lg px-6 py-4">
-                    <div className="flex items-start justify-between gap-4">
-                        <div>
-                            {/* Breadcrumb */}
-                            <div className="flex items-center gap-1.5 text-xs text-muted-foreground mb-2">
-                                <button onClick={() => navigate("/home")} className="hover:text-white flex items-center gap-1">
-                                    <ArrowLeft className="w-3 h-3" />
-                                    Monitors
-                                </button>
-                                <span>/</span>
-                                <span className="text-white">{monitor.name}</span>
-                            </div>
-                            {/* Name + URL */}
-                            <div className="flex items-center gap-3">
-                                <div className={`w-2 h-2 rounded-full ${statusDot} shrink-0`} />
-                                <h1 className="text-white font-semibold text-xl leading-none">{monitor.name}</h1>
-                                <a
-                                    href={monitor.url}
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    className="flex items-center gap-1 text-sm text-muted-foreground hover:text-white transition-colors"
-                                >
-                                    {/*{monitor.url.replace(/^https?:\/\//, '')}*/}
-                                    <ExternalLink className="w-3 h-3" />
-                                </a>
-                            </div>
-                        </div>
-                        <Button
-                            variant="ghost"
-                            size="icon"
-                            className="text-muted-foreground hover:text-white h-9 w-9 shrink-0"
-                            onClick={onRefresh}
-                            disabled={refreshing}
-                        >
-                            <RefreshCw className={`w-4 h-4 ${refreshing ? 'animate-spin' : ''}`} />
-                        </Button>
-                    </div>
-                </div>
-
-                <div className="px-6 py-6 max-w-6xl mx-auto space-y-5">{children}</div>
-            </main>
-        </div>
+        </PageShell >
     );
 }

@@ -102,9 +102,8 @@ websiteRouter.get("/:websiteId", authMiddleware, async (req: Request, res: Respo
                 user_id: userId
             }, 
             include: {
-                
                 ticks: true
-            }
+            },
         })
         
         if(!web) {
