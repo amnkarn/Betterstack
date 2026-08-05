@@ -14,11 +14,10 @@ import { format } from 'date-fns';
 import { Loader2 } from 'lucide-react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { fetchWebsite } from '@/api/homeApi';
-import { type MonitorResponse, type MonitorTick } from '@/types/monitor';
+import { type MonitorCheck, type MonitorResponse, type MonitorTick } from '@/types/monitor';
 import { PageShell } from '@/components/MonitorPage/PageShell';
 // ─── Types ───────────────────────────────────────────────────────────────────
 
-type TimeRange = '24H' | '7D' | '30D' | '90D';
 
 interface ChartPoint {
     label: string;
@@ -44,20 +43,23 @@ interface Incident {
 }
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
+type TimeRange = '1H' | '24H' | '7D' | '30D';
 
 const TIME_RANGES: { label: TimeRange; hours: number }[] = [
+    { label: '1H', hours: 1 },
     { label: '24H', hours: 24 },
     { label: '7D', hours: 168 },
     { label: '30D', hours: 720 },
-    { label: '90D', hours: 2160 },
 ];
+
+
 
 function getBucketMs(range: TimeRange): number {
     const map: Record<TimeRange, number> = {
-        '24H': 60 * 60 * 1000,          // 1 hour
-        '7D': 6 * 60 * 60 * 1000,       // 6 hours
-        '30D': 24 * 60 * 60 * 1000,     // 1 day
-        '90D': 24 * 60 * 60 * 1000,     // 1 day
+        '1H': 60 * 60 * 1000,          // 1 hour
+        '24H': 24 * 60 * 60 * 1000,       // 24 hours
+        '7D': 7 * 24 * 60 * 60 * 1000,     // 7 day
+        '30D': 30 * 24 * 60 * 60 * 1000,     // 30 day
     };
     return map[range];
 }
@@ -276,31 +278,36 @@ export default function MonitorPage() {
     const params = useParams();
     const websiteId = (params.websiteId as string);
     const [refreshing, setRefreshing] = useState<boolean>(false);
-    const [monitor, setMonitor] = useState<MonitorResponse | null>();
+    const [monitor, setMonitor] = useState<MonitorResponse | null>(null);
+    const [loading, setLoading] = useState(false);
 
+    //-------------------------------------------------------------------
 
+    //****************
+    //task => based on time range feth data from the backend
+
+    const [range, setRange] = useState<TimeRange>('1H'); //time range
+
+    
     const [allChecks, setAllChecks] = useState<MonitorCheck[]>([]); //
 
-
     const [checks, setChecks] = useState<MonitorCheck[]>([]);
-    const [loading, setLoading] = useState(false);
-    const [range, setRange] = useState<TimeRange>('24H');
 
 
     // Filter checks to selected time range
     useEffect(() => {
         const hoursMap: Record<TimeRange, number> = {
+            '1H': 1,
             '24H': 24,
             '7D': 168,
             '30D': 720,
-            '90D': 2160,
         };
         const now = Date.now();
         const cutoff = now - hoursMap[range] * 60 * 60 * 1000;
 
-        setChecks(allChecks.filter((c) => { 
+        setChecks(allChecks.filter((c) => 
             new Date(c.checked_at).getTime() >= cutoff
-        }));
+        ));
     }, [allChecks, range]);
 
     // Derived stats
@@ -342,6 +349,7 @@ export default function MonitorPage() {
     const xFmt = getXAxisFormat(range);
     const hasChecks = allChecks.length > 0;
 
+    //-------------------------------------
     async function fetchWeb() {
         try {
             setLoading(true);
@@ -355,7 +363,7 @@ export default function MonitorPage() {
                 .map((t: MonitorTick) => ({
                     id: t.id,
                     monitor_id: t.website_id,
-                    status: t.status.toLowerCase(),
+                    status: t.status,
                     response_time: t.response_time_ms,
                     error_message: null,
                     checked_at: t.createdAt

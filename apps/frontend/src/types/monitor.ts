@@ -28,3 +28,13 @@ export interface MonitorResponse {
     time_added: string;
     ticks: MonitorTick[];
 }
+
+//used in graphs
+export interface MonitorCheck {
+    id: string;
+    monitor_id: string;
+    status: WebsiteStatus;
+    response_time: number | null;
+    error_message: string | null;
+    checked_at: string
+}
