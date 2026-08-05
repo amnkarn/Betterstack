@@ -36,7 +36,8 @@ model Website_tick {
   region_id         String
   website_id        String
   region            Region    @relation(fields: [region_id], references: [id])
-  website           Website   @relation(fields: [website_id], references: [id])
+  //using cascade, website_tick's will automatically deleted
+  website           Website   @relation(fields: [website_id], references: [id], onDelete: Cascade)
   createdAt         DateTime  @default(now())
 }
 

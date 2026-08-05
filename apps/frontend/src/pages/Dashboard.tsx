@@ -17,8 +17,9 @@ import DashboardSidebar from '@/components/DashboardSidebar';
 import StatCard from '@/components/StatCard';
 import MonitorsTable from '@/components/MonitorsTable';
 import ThemeToggle from '@/components/ThemeToggle';
-import { fetchWebsites } from '@/api/homeApi';
+import { deleteWebsite, fetchWebsites } from '@/api/homeApi';
 import { useNavigate } from 'react-router-dom';
+import DeleteModal from '@/components/DeleteModal';
 //--------------------------------------------------------------
 
 
@@ -32,19 +33,19 @@ export default function Dashboard() {
 
 
     const fetchWebs = async (isInitial = false) => {
-        if(isInitial) {
+        if (isInitial) {
             setLoading(true);
         }
 
         try {
             const res = await fetchWebsites();
-            console.log(res);
+            //console.log(res);
             setWebsites(res.map((w: any) => ({
                 id: w.id,
                 url: w.url,
                 status: w.ticks[0] ? (w.ticks[0].status === "Up" ? "Up" : "Down") : "Unknown",
                 responseTime: w.ticks[0] ? w.ticks[0].response_time_ms : 0,
-                lastChecked: 
+                lastChecked:
                     w.ticks[0] ? new Date(w.ticks[0].createdAt).toLocaleString() : new Date().toLocaleString(),
                 timeAdded: new Date(w.time_added).toLocaleString() || new Date().toLocaleString(),
                 region: w.ticks[0] ? w.ticks[0].region.name : "checking"
@@ -53,13 +54,13 @@ export default function Dashboard() {
         } catch (error) {
             console.log(error);
         } finally {
-            if(isInitial) setLoading(false);
+            if (isInitial) setLoading(false);
         }
     }
 
     useEffect(() => {
         fetchWebs(true); //initial fetch
-        
+
         const interval = setInterval(async () => {
             await fetchWebs(false);
         }, 30000)
@@ -69,11 +70,11 @@ export default function Dashboard() {
 
     const upCount = websites.filter((m) => m.status === "Up").length;
     const downCount = websites.filter((m) => m.status === "Down").length;
-    
+
     const [search, setSearch] = useState(''); //search the website
 
     useEffect(() => {
-        if(!search.trim()) {
+        if (!search.trim()) {
             setFilteredWeb(websites);
             return;
         }
@@ -96,6 +97,29 @@ export default function Dashboard() {
         setRefreshing(true);
         await fetchWebs(true);
         setRefreshing(false);
+    }
+
+    const [deleteTargetId, setDeleteTargetId] = useState<string | null>(null);
+    const [deleting, setDeleting] = useState(false);
+
+    const handleDelete = async () => {
+        if(deleteTargetId === null) {
+            return;
+        }
+        setLoading(true);
+        setDeleting(true);
+
+        try {
+            console.log("delete id", deleteTargetId)
+            await deleteWebsite(deleteTargetId);          
+        } catch (error) {
+            console.log("Failed to delete", error);
+        } finally {
+            setDeleting(false);
+            setDeleteTargetId(null);
+            refreshMonitors();
+            setLoading(false);
+        }
     }
 
     return (
@@ -202,8 +226,8 @@ export default function Dashboard() {
                         ) : (
                             <MonitorsTable
                                 filteredMonitors={filteredWeb}
-                                onTogglePause={() => {}}
-                                onDeleteClick={() => {}}
+                                onTogglePause={() => { }}
+                                onDeleteClick={(monitor) => setDeleteTargetId(monitor)}
                             />
                         )}
                     </div>
@@ -214,6 +238,14 @@ export default function Dashboard() {
             <AddMonitorModal
                 open={modalOpen}
                 onClose={() => setModalOpen(false)}
+                refresh={refreshMonitors}
+            />
+
+            <DeleteModal 
+                deleteTargetId={deleteTargetId}
+                setDeleteTargetId={setDeleteTargetId}
+                onClick={handleDelete}
+                deleting={deleting}
             />
         </div>
     );

@@ -15,6 +15,7 @@ import { Button } from './ui/Button';
 interface AddMonitorModalProps {
     open: boolean;
     onClose: () => void;
+    refresh: () => void
 }
 
 const intervalOptions = [
@@ -26,7 +27,7 @@ const intervalOptions = [
     { label: '1 hour', value: 3600 },
 ];
 
-export default function AddMonitorModal({ open, onClose }: AddMonitorModalProps) {
+export default function AddMonitorModal({ open, onClose, refresh }: AddMonitorModalProps) {
     const [url, setUrl] = useState('');
     const [interval, setInterval] = useState(60);
     const [loading, setLoading] = useState(false);
@@ -38,7 +39,8 @@ export default function AddMonitorModal({ open, onClose }: AddMonitorModalProps)
         setLoading(true);
         await addWebsite(url);
         setLoading(false);
-
+        //refresh
+        refresh();
         // Reset form
         setUrl('');
         setInterval(60);

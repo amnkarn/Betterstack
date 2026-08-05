@@ -32,20 +32,11 @@ const DropdownMenuContext = React.createContext<{
 
 export function DropdownMenu({ children }: DropdownMenuProps) {
     const [open, setOpen] = useState(false);
-    return (
-        <DropdownMenuContext.Provider value={{ open, setOpen }}>
-            <div className="relative inline-block">{children}</div>
-        </DropdownMenuContext.Provider>
-    );
-}
-
-export function DropdownMenuTrigger({ children, asChild }: DropdownMenuTriggerProps) {
-    const { open, setOpen } = React.useContext(DropdownMenuContext);
-    const triggerRef = useRef<HTMLDivElement>(null);
+    const menuRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
         const handleClickOutside = (event: MouseEvent) => {
-            if (triggerRef.current && !triggerRef.current.contains(event.target as Node)) {
+            if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
                 setOpen(false);
             }
         };
@@ -53,17 +44,32 @@ export function DropdownMenuTrigger({ children, asChild }: DropdownMenuTriggerPr
             document.addEventListener('mousedown', handleClickOutside);
         }
         return () => document.removeEventListener('mousedown', handleClickOutside);
-    }, [open, setOpen]);
+    }, [open]);
+
+    return (
+        <DropdownMenuContext.Provider value={{ open, setOpen }}>
+            <div ref={menuRef} className="relative inline-block">{children}</div>
+        </DropdownMenuContext.Provider>
+    );
+}
+
+export function DropdownMenuTrigger({ children, asChild }: DropdownMenuTriggerProps) {
+    const { open, setOpen } = React.useContext(DropdownMenuContext);
 
     if (asChild) {
         return React.cloneElement(children as React.ReactElement, {
-            onClick: () => setOpen(!open),
-            ref: triggerRef,
+            onClick: (e: React.MouseEvent) => {
+                e.stopPropagation();
+                setOpen(!open);
+            }
         });
     }
 
     return (
-        <div ref={triggerRef} onClick={() => setOpen(!open)}>
+        <div onClick={(e) => {
+            e.stopPropagation();
+            setOpen(!open);
+        }}>
             {children}
         </div>
     );
@@ -82,7 +88,7 @@ export function DropdownMenuContent({ children, align = 'end', className = '' }:
 
     return (
         <div
-            className={`absolute z-50 min-w-[8rem] overflow-hidden rounded-md border bg-popover p-1 text-popover-foreground shadow-md ${alignClasses[align]} ${className}`}
+            className={`absolute z-50 min-w-32 overflow-hidden rounded-md border bg-popover p-1 text-popover-foreground shadow-md ${alignClasses[align]} ${className}`}
         >
             {children}
         </div>

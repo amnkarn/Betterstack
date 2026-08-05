@@ -8,3 +8,7 @@ export const UserInputSchema = z.object({
 export const CreateWebsiteInput = z.object({
     url: z.string().min(5),
 })
+
+export const DeleteWebParams = z.object({
+    websiteId: z.string().uuid({ message: "Invalid website ID format. Must be a valid UUID." })
+})

@@ -22,12 +22,12 @@ import { useNavigate } from 'react-router-dom';
 interface MonitorsTableProps {
     filteredMonitors: MonitorWebsite[];
     onTogglePause: (monitor: MonitorWebsite) => void;
-    onDeleteClick: (monitor: MonitorWebsite) => void;
+    onDeleteClick: (monitor: string) => void;
 }
 
 export default function MonitorsTable({
     filteredMonitors,
-    onDeleteClick,
+    onDeleteClick, //return's back the id
 }: MonitorsTableProps) {
     const navigate = useNavigate();
 
@@ -132,7 +132,7 @@ export default function MonitorsTable({
                                     >
                                         <DropdownMenuItem
                                             className="gap-2 cursor-pointer hover:bg-secondary focus:bg-secondary"
-                                            onClick={() => navigate("/asdf")}
+                                            onClick={() => navigate(`/monitor/${monitor.id}`)}
                                         >
                                             <ExternalLink className="w-4 h-4 text-muted-foreground" />
                                             View Analytics
@@ -140,7 +140,8 @@ export default function MonitorsTable({
                                         <DropdownMenuSeparator className="bg-border" />
                                         <DropdownMenuItem
                                             className="gap-2 cursor-pointer text-red-400 hover:bg-red-500/10 focus:bg-red-500/10 focus:text-red-400"
-                                            onClick={() => onDeleteClick(monitor)}
+                                            //call onDeleteClick with passing the id
+                                            onClick={() => onDeleteClick(monitor.id)}
                                         >
                                             <Trash2 className="w-4 h-4" />
                                             Delete
