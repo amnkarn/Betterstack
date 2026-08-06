@@ -22,9 +22,11 @@ export default function Footer() {
 
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <div className="glass rounded-3xl px-8 py-16 glow">
-            <div className="inline-flex w-16 h-16 rounded-2xl bg-primary/20 border border-primary/40 items-center justify-center mb-6 mx-auto">
-              <Activity className="w-8 h-8 text-primary" />
+
+            <div className="inline-flex w-16 h-16 rounded-2xl bg-primary/20 border border-primary/40 items-center justify-center mb-6 mx-auto transition-transform hover:scale-105">
+              <img className="rounded-2xl object-cover w-full h-full" src='./logo.png' alt="Logo" />
             </div>
+
             <h2 className="text-4xl sm:text-5xl font-extrabold text-foreground mb-4 tracking-tight">
               Start monitoring
               <br />
@@ -44,7 +46,7 @@ export default function Footer() {
                   <ArrowRight className="ml-2 w-4 h-4" />
                 </Button>
               </Link>
-              
+
               <Button
                 size="lg"
                 variant="outline"
@@ -64,8 +66,8 @@ export default function Footer() {
             {/* Brand */}
             <div className="col-span-2">
               <a href="#" className="flex items-center gap-2 mb-4 group w-fit">
-                <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center glow-sm transition-transform group-hover:scale-110">
-                  <Activity className="w-4 h-4 text-primary-foreground" />
+                <div className="w-8 h-8 rounded-lg border-2 border-zinc-400 flex items-center justify-center group-hover:scale-110 transition-transform shrink-0">
+                  <img className="rounded-2xl object-cover" src='./logo.png' />
                 </div>
                 <span className="font-bold text-foreground text-lg">Betteruptime</span>
               </a>

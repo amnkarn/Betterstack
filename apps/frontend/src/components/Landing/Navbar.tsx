@@ -45,8 +45,8 @@ export default function Navbar() {
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
           <a href="#" className="flex items-center gap-2 group">
-            <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center glow-sm transition-all group-hover:scale-110">
-              <Activity className="w-4 h-4 text-primary-foreground" />
+            <div className="w-8 h-8 rounded-lg border-2 border-zinc-400 flex items-center justify-center group-hover:scale-110 transition-transform shrink-0">
+              <img className="rounded-2xl object-cover" src='./logo.png' />
             </div>
             <span className="font-bold text-lg text-foreground tracking-tight">
               Betteruptime

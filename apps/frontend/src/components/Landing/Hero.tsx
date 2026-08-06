@@ -91,7 +91,7 @@ export default function Hero() {
           ))}
         </div>
 
-        {/* Dashboard mockup */}
+        {/* Landin mockup */}
         <div
           className="w-full max-w-4xl animate-fade-up"
           style={{ animationDelay: '380ms', opacity: 0 }}

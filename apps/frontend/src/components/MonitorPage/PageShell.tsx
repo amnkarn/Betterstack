@@ -33,9 +33,9 @@ export function PageShell({
             <aside className="fixed top-0 left-0 bottom-0 w-60 border-r border-border bg-card/60 backdrop-blur-sm hidden lg:flex flex-col z-40">
                 <div className="px-5 py-5 border-b border-border">
                     <button onClick={onBack} className="flex items-center gap-2 group w-full">
-                        <div className="w-8 h-8 rounded-lg bg-sky-500 flex items-center justify-center group-hover:scale-110 transition-transform shrink-0">
-                            <Activity className="w-4 h-4 text-white" />
-                        </div>
+                        <div className="w-8 h-8 rounded-lg border-2 border-zinc-400 flex items-center justify-center group-hover:scale-110 transition-transform shrink-0">
+                        <img className="rounded-2xl object-cover" src='../logo.png' />
+                    </div>
                         <span className="font-bold text-foreground text-base">PulseWatch</span>
                     </button>
                 </div>

@@ -13,14 +13,18 @@ export function App() {
       <Routes>
         <Route path="/" element={<LandingPage />} />
         <Route path="/auth" element={<Auth />} />
-      
+
         <Route path="/home" element={
           <ProtectRouter>
             <Dashboard />
           </ProtectRouter>
         } />
 
-        <Route path="/monitor/:websiteId" element={<MonitorPage />} />
+        <Route path="/monitor/:websiteId" element={
+          <ProtectRouter>
+            <MonitorPage />
+          </ProtectRouter>
+        } />
 
       </Routes>
     </BrowserRouter>
@@ -35,9 +39,9 @@ function ProtectRouter({ children }: { children: React.ReactNode }) {
   const token = cookies.includes('token=') ? cookies.split('token=')[1].split(';')[0] : null;
   //console.log(token);
 
-  if(!token) {
-    return <Navigate to={"/"} />
+  if (!token) {
+    return <Navigate to={"/auth"} />
   }
 
-  return <>{ children }</>
+  return <>{children}</>
 }
