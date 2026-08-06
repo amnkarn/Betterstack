@@ -91,73 +91,91 @@ export default function Hero() {
           ))}
         </div>
 
-        {/* Landin mockup */}
+        {/* Landing mockup */}
         <div
           className="w-full max-w-4xl animate-fade-up"
           style={{ animationDelay: '380ms', opacity: 0 }}
         >
-          <div className="rounded-2xl p-10 glow border border-border/50 bg-card/50 backdrop-blur-md">
-            {/* Top bar */}
-            <div className="flex items-center justify-between mb-6">
-              <div className="flex items-center gap-2">
-                <div className="w-2.5 h-2.5 rounded-full bg-green-500 animate-pulse" />
-                <span className="text-sm font-medium text-foreground">All systems operational</span>
+          <div className="rounded-2xl p-4 sm:p-8 glow-sm border border-border/50 bg-card/60 backdrop-blur-xl shadow-2xl relative overflow-hidden">
+            {/* Window controls */}
+            <div className="flex items-center gap-2 mb-8">
+              <div className="w-3 h-3 rounded-full bg-red-500/80" />
+              <div className="w-3 h-3 rounded-full bg-yellow-500/80" />
+              <div className="w-3 h-3 rounded-full bg-green-500/80" />
+              <div className="ml-4 text-xs font-medium text-muted-foreground">pulsewatch.app / dashboard</div>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+              <div className="bg-background/40 border border-border/50 rounded-xl p-5 shadow-sm">
+                <div className="text-sm text-muted-foreground mb-1">Global Uptime</div>
+                <div className="text-3xl font-bold text-foreground font-mono">99.99%</div>
+                <div className="text-xs text-emerald-400 mt-2 flex items-center gap-1.5">
+                  <div className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" /> All systems operational
+                </div>
               </div>
-              <div className="flex items-center gap-4">
-                {metrics.map((m) => (
-                  <div key={m.label} className="text-center hidden sm:block">
-                    <div className="text-sm font-bold text-foreground">{m.value}</div>
-                    <div className="text-xs text-muted-foreground">{m.label}</div>
-                  </div>
-                ))}
+              <div className="bg-background/40 border border-border/50 rounded-xl p-5 shadow-sm">
+                <div className="text-sm text-muted-foreground mb-1">Avg Response</div>
+                <div className="text-3xl font-bold text-foreground font-mono">124<span className="text-xl text-muted-foreground ml-1">ms</span></div>
+                <div className="text-xs text-sky-400 mt-2 flex items-center gap-1.5">
+                  <span className="font-bold">↓</span> 12ms faster today
+                </div>
+              </div>
+              <div className="bg-background/40 border border-border/50 rounded-xl p-5 shadow-sm">
+                <div className="text-sm text-muted-foreground mb-1">Active Monitors</div>
+                <div className="text-3xl font-bold text-foreground font-mono">24</div>
+                <div className="text-xs text-muted-foreground mt-2 flex items-center gap-1.5">
+                  Across 5 global regions
+                </div>
               </div>
             </div>
 
-            {/* Status rows */}
-            <div className="space-y-4">
-              {statusBars.map((service) => (
-                <div key={service.label} className="flex items-center gap-4">
-                  <div className="w-28 text-left">
-                    <span className="text-sm text-muted-foreground">{service.label}</span>
-                  </div>
-                  <div className="flex-1 flex gap-0.5 items-end h-8">
-                    {service.bars.map((h, i) => (
-                      <div
-                        key={i}
-                        className="flex-1 rounded-sm transition-all"
-                        style={{
-                          height: `${h * 100}%`,
-                          backgroundColor:
-                            h === 1
-                              ? 'hsl(142 71% 45%)'
-                              : h > 0.4
-                              ? 'hsl(38 92% 50%)'
-                              : 'hsl(0 72% 51%)',
-                          opacity: 0.8 + i * 0.007,
-                        }}
-                      />
-                    ))}
-                  </div>
-                  <div className="w-16 text-right">
-                    <span className="text-xs font-mono text-muted-foreground">{service.uptime}</span>
-                  </div>
+            {/* Chart Area */}
+            <div className="bg-background/40 border border-border/50 rounded-xl p-5 h-48 relative overflow-hidden flex flex-col shadow-sm">
+              <div className="flex justify-between items-center mb-4 relative z-10">
+                <div className="flex items-center gap-3">
+                  <div className="text-sm font-medium text-foreground">API Response Time</div>
+                  <Badge variant="outline" className="text-[10px] h-5 border-primary/20 text-primary bg-primary/5">Live</Badge>
                 </div>
-              ))}
-            </div>
+                <div className="text-xs text-muted-foreground">Last 24 hours</div>
+              </div>
+              <div className="absolute inset-x-0 bottom-0 top-12">
+                {/* Horizontal grid lines */}
+                <div className="absolute inset-0 flex flex-col justify-between pt-2 pb-0">
+                  {[...Array(4)].map((_, i) => (
+                    <div key={i} className="w-full h-[1px] bg-border/40" />
+                  ))}
+                </div>
+                
+                <svg className="w-full h-full relative z-10" preserveAspectRatio="none" viewBox="0 0 100 100">
+                  <defs>
+                    <linearGradient id="mockupGrad" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="0%" stopColor="#38bdf8" stopOpacity="0.3" />
+                      <stop offset="100%" stopColor="#38bdf8" stopOpacity="0" />
+                    </linearGradient>
+                  </defs>
+                  <path
+                    d="M0,100 L0,70 L10,65 L20,72 L30,68 L40,30 L45,68 L50,75 L60,70 L70,72 L80,65 L90,68 L100,70 L100,100 Z"
+                    fill="url(#mockupGrad)"
+                  />
+                  <path
+                    d="M0,70 L10,65 L20,72 L30,68 L40,30 L45,68 L50,75 L60,70 L70,72 L80,65 L90,68 L100,70"
+                    fill="none"
+                    stroke="#38bdf8"
+                    strokeWidth="2"
+                    vectorEffect="non-scaling-stroke"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                  {/* Tooltip dot */}
+                  <circle cx="40" cy="30" r="2.5" fill="#38bdf8" className="animate-pulse" />
+                </svg>
 
-            {/* Bottom legend */}
-            <div className="flex gap-4 mt-5 pt-4 border-t border-border">
-              {[
-                { color: 'bg-green-400', label: 'Operational' },
-                { color: 'bg-yellow-500', label: 'Degraded' },
-                { color: 'bg-red-500', label: 'Outage' },
-              ].map((item) => (
-                <div key={item.label} className="flex items-center gap-1.5 text-xs text-muted-foreground">
-                  <div className={`w-2 h-2 rounded-sm ${item.color}`} />
-                  {item.label}
+                {/* Tooltip HTML */}
+                <div className="absolute top-[15%] left-[42%] bg-card border border-border shadow-xl rounded-md px-2 py-1.5 text-xs z-20">
+                  <div className="font-mono text-sky-400 font-bold">482 ms</div>
+                  <div className="text-[10px] text-muted-foreground mt-0.5">Spike detected</div>
                 </div>
-              ))}
-              <span className="ml-auto text-xs text-muted-foreground">Last 90 days</span>
+              </div>
             </div>
           </div>
         </div>
