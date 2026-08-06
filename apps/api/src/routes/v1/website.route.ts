@@ -94,7 +94,18 @@ websiteRouter.get("/:websiteId", authMiddleware, async (req: Request, res: Respo
         })
     }
     const userId = (req as any).userId;
-    
+
+    const timeRange = (req.query.range as string) || '24H';
+    const hoursMap: Record<string, number> = {
+        '1H': 1,
+        "24H": 24,
+        "7D": 168,
+        "30D": 720
+    }
+
+    const hours = hoursMap[timeRange] || 24;
+    const cuttoffDate = new Date(Date.now() - (hours * 60 * 60 * 1000)); //send data after this time
+
     try {
         const web = await prismaClient.website.findFirst({
             where: {
@@ -102,7 +113,16 @@ websiteRouter.get("/:websiteId", authMiddleware, async (req: Request, res: Respo
                 user_id: userId
             }, 
             include: {
-                ticks: true
+                ticks: {
+                    where: {
+                        createdAt: { //gte = greater than or equal to
+                            gte: cuttoffDate
+                        }
+                    },
+                    orderBy: {
+                        createdAt: 'asc'
+                    }
+                }
             },
         })
         

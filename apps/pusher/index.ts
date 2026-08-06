@@ -17,6 +17,7 @@ async function main() {
         })))
     } catch (error) {
         console.error("Error in pusher main:", error);
+        res
     }
 }
 

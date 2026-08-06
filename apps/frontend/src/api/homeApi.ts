@@ -29,9 +29,9 @@ export async function deleteWebsite(id: string) {
     console.log(res);
 }
 
-export async function fetchWebsite(id: string) {
+export async function fetchWebsite(id: string, range: string) {
     try {
-        const res = await axios.get(`${BASE_URL}/api/v1/website/${id}`, {
+        const res = await axios.get(`${BASE_URL}/api/v1/website/${id}?range=${range}`, {
             withCredentials: true
         })
     

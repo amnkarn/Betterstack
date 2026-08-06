@@ -66,10 +66,10 @@ function getBucketMs(range: TimeRange): number {
 
 function getXAxisFormat(range: TimeRange): (ts: number) => string {
     const fmts: Record<TimeRange, string> = {
+        '1H': 'HH:mm',
         '24H': 'HH:mm',
         '7D': 'MMM d',
         '30D': 'MMM d',
-        '90D': 'MMM d',
     };
     return (ts: number) => format(ts, fmts[range]);
 }
@@ -284,31 +284,12 @@ export default function MonitorPage() {
     //-------------------------------------------------------------------
 
     //****************
-    //task => based on time range feth data from the backend
-
-    const [range, setRange] = useState<TimeRange>('1H'); //time range
+    const [range, setRange] = useState<TimeRange>('24H'); //time range
 
     
     const [allChecks, setAllChecks] = useState<MonitorCheck[]>([]); //
 
     const [checks, setChecks] = useState<MonitorCheck[]>([]);
-
-
-    // Filter checks to selected time range
-    useEffect(() => {
-        const hoursMap: Record<TimeRange, number> = {
-            '1H': 1,
-            '24H': 24,
-            '7D': 168,
-            '30D': 720,
-        };
-        const now = Date.now();
-        const cutoff = now - hoursMap[range] * 60 * 60 * 1000;
-
-        setChecks(allChecks.filter((c) => 
-            new Date(c.checked_at).getTime() >= cutoff
-        ));
-    }, [allChecks, range]);
 
     // Derived stats
     const chartPoints = useMemo(
@@ -353,7 +334,8 @@ export default function MonitorPage() {
     async function fetchWeb() {
         try {
             setLoading(true);
-            const res = await fetchWebsite(websiteId);
+            //return data >= the range
+            const res = await fetchWebsite(websiteId, range);
             console.log(res);
             if(res) {
                 setMonitor(res);
@@ -370,6 +352,7 @@ export default function MonitorPage() {
                 }));
 
             setAllChecks(mappedChecks);
+            setChecks(mappedChecks);
 
         } catch (error) {
             console.log("Failed to fetch website: ", error);
@@ -380,7 +363,7 @@ export default function MonitorPage() {
 
     useEffect(() => {
         fetchWeb();
-    }, [websiteId])
+    }, [websiteId, range])
 
     async function refreshMonitor() {
         setRefreshing(true);
@@ -401,7 +384,7 @@ export default function MonitorPage() {
 
     return (
         <PageShell monitor={monitor} onBack={() => navigate("/home")} onRefresh={refreshMonitor} refreshing={refreshing}>
-            {/* Time range */}
+            {/* Show all time range, and set in 'setRange' state */}
             <div className="flex items-center gap-1 border border-border rounded-lg p-1 w-fit bg-card">
                 {TIME_RANGES.map(({ label }) => (
                     <button

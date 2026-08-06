@@ -36,6 +36,9 @@ v1Route.get("/websites", authMiddleware, async (req, res) => {
 
     } catch (error) {
         console.log("Error in fetch all website routes", error);
+        res.status(500).json({
+            message: "something went wrong",
+        })
     }
 })
 
@@ -47,32 +50,39 @@ v1Route.get("/status/:websiteId", authMiddleware, async (req, res) => {
 
     const userId = (req as any).userId!;
 
-    const website = await prismaClient.website.findFirst({
-        where: {
-            id: (websiteId as string),
-            user_id: userId,
-        },
-        include: {
-            ticks: {
-                orderBy: [{
-                    createdAt: "desc"
-                }],
-                take: 10, //3 min interval
+    try {
+        const website = await prismaClient.website.findFirst({
+            where: {
+                id: (websiteId as string),
+                user_id: userId,
+            },
+            include: {
+                ticks: {
+                    orderBy: [{
+                        createdAt: "desc"
+                    }],
+                    take: 10, //3 min interval
+                }
             }
+        })
+    
+        if(!website) {
+            return res.status(400).json({
+                message: "website not found"
+            })
         }
-    })
-
-    if(!website) {
-        return res.status(400).json({
-            message: "website not found"
+    
+        res.status(200).json({
+            url: website.url,
+            id: website.id,
+            user_id: website.user_id
+        })
+    } catch (error) {
+        console.log("Error in fetching website status", error);
+        res.status(500).json({
+            message: "Something went wrong"
         })
     }
-
-    res.status(200).json({
-        url: website.url,
-        id: website.id,
-        user_id: website.user_id
-    })
 })
 
 export default v1Route;
