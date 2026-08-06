@@ -12,14 +12,14 @@ import {
     Loader2,
 } from 'lucide-react';
 import type { MonitorWebsite } from '@/types/monitor';
-import AddMonitorModal from '@/components/AddMonitorModal';
-import DashboardSidebar from '@/components/DashboardSidebar';
-import StatCard from '@/components/StatCard';
-import MonitorsTable from '@/components/MonitorsTable';
+import AddMonitorModal from '@/components/Dashboard/AddMonitorModal';
+import DashboardSidebar from '@/components/Dashboard/DashboardSidebar';
+import StatCard from '@/components/Dashboard/StatCard';
+import MonitorsTable from '@/components/Dashboard/MonitorsTable';
 import ThemeToggle from '@/components/ThemeToggle';
 import { deleteWebsite, fetchWebsites } from '@/api/homeApi';
 import { useNavigate } from 'react-router-dom';
-import DeleteModal from '@/components/DeleteModal';
+import DeleteModal from '@/components/Dashboard/DeleteModal';
 //--------------------------------------------------------------
 
 

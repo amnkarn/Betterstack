@@ -10,15 +10,20 @@ import {
     ReferenceArea,
     ReferenceLine,
 } from 'recharts';
-import { format } from 'date-fns';
 import { Loader2 } from 'lucide-react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { fetchWebsite } from '@/api/homeApi';
-import { type MonitorCheck, type MonitorResponse, type MonitorTick } from '@/types/monitor';
+import { type MonitorCheck, type MonitorResponse } from '@/types/monitor';
 import { PageShell } from '@/components/MonitorPage/PageShell';
+import StatBox from '@/components/MonitorPage/StatBox';
+import detectIncidents from '@/helpers/detectIncidents';
+import UptimeBar from '@/components/MonitorPage/UptimeBar';
+import buildDayBars from '@/helpers/buildDayBars';
+import { format } from 'date-fns';
+import Incidents from '@/components/MonitorPage/Insidents';
+
+
 // ─── Types ───────────────────────────────────────────────────────────────────
-
-
 interface ChartPoint {
     label: string;
     timestamp: number;
@@ -28,18 +33,12 @@ interface ChartPoint {
     down: number;
 }
 
-interface DayBar {
+export interface DayBar {
     date: Date;
     label: string;
     uptimePct: number;
     total: number;
     hasData: boolean;
-}
-
-interface Incident {
-    start: Date;
-    end: Date | null;
-    durationMs: number;
 }
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
@@ -51,8 +50,6 @@ const TIME_RANGES: { label: TimeRange; hours: number }[] = [
     { label: '7D', hours: 168 },
     { label: '30D', hours: 720 },
 ];
-
-
 
 function getBucketMs(range: TimeRange): number {
     const map: Record<TimeRange, number> = {
@@ -83,7 +80,7 @@ function bucketChecks(checks: MonitorCheck[], bucketMs: number): ChartPoint[] {
         const entry = map.get(bucket) ?? { sum: 0, count: 0, down: 0 };
         if (c.response_time != null) entry.sum += c.response_time;
         entry.count++;
-        if (c.status === 'down') entry.down++;
+        if (c.status === 'Down') entry.down++;
         map.set(bucket, entry);
     }
 
@@ -99,92 +96,7 @@ function bucketChecks(checks: MonitorCheck[], bucketMs: number): ChartPoint[] {
         .sort((a, b) => a.timestamp - b.timestamp);
 }
 
-function buildDayBars(checks: MonitorCheck[]): DayBar[] {
-    const now = Date.now();
-    const dayMs = 24 * 60 * 60 * 1000;
-    const map = new Map<number, { total: number; down: number }>();
-
-    for (const c of checks) {
-        const ts = new Date(c.checked_at).getTime();
-        const day = Math.floor(ts / dayMs) * dayMs;
-        const entry = map.get(day) ?? { total: 0, down: 0 };
-        entry.total++;
-        if (c.status === 'down') entry.down++;
-        map.set(day, entry);
-    }
-
-    const bars: DayBar[] = [];
-    for (let i = 89; i >= 0; i--) {
-        const dayStart = Math.floor((now - i * dayMs) / dayMs) * dayMs;
-        const entry = map.get(dayStart);
-        bars.push({
-            date: new Date(dayStart),
-            label: format(dayStart, 'MMM d, yyyy'),
-            uptimePct: entry ? ((entry.total - entry.down) / entry.total) * 100 : 0,
-            total: entry?.total ?? 0,
-            hasData: !!entry,
-        });
-    }
-    return bars;
-}
-
-function detectIncidents(checks: MonitorCheck[]): Incident[] {
-    const sorted = [...checks].sort(
-        (a, b) => new Date(a.checked_at).getTime() - new Date(b.checked_at).getTime(),
-    );
-
-    const incidents: Incident[] = [];
-    let start: Date | null = null;
-
-    for (const c of sorted) {
-        if (c.status === 'down' && !start) {
-            start = new Date(c.checked_at);
-        } else if (c.status === 'up' && start) {
-            const end = new Date(c.checked_at);
-            incidents.push({ start, end, durationMs: end.getTime() - start.getTime() });
-            start = null;
-        }
-    }
-    if (start) {
-        const end = new Date();
-        incidents.push({ start, end: null, durationMs: end.getTime() - start.getTime() });
-    }
-
-    return incidents.reverse();
-}
-
-
-// ─── Sub-components ───────────────────────────────────────────────────────────
-
-function StatBox({
-    label,
-    value,
-    sub,
-    tone,
-}: {
-    label: string;
-    value: string;
-    sub?: string;
-    tone?: 'green' | 'red' | 'neutral';
-}) {
-    const valueColor =
-        tone === 'green'
-            ? 'text-emerald-400'
-            : tone === 'red'
-                ? 'text-red-400'
-                : 'text-foreground';
-
-    return (
-        <div className="bg-card border border-border rounded-lg px-5 py-4">
-            <p className="text-[11px] font-medium uppercase tracking-widest text-muted-foreground mb-2">
-                {label}
-            </p>
-            <p className={`text-2xl font-bold font-mono leading-none ${valueColor}`}>{value}</p>
-            {sub && <p className="text-xs text-muted-foreground mt-1.5">{sub}</p>}
-        </div>
-    );
-}
-
+//used in chart
 function ChartTooltip({ active, payload }: any) {
     if (!active || !payload?.length) return null;
     const d = payload[0]?.payload as ChartPoint;
@@ -206,70 +118,6 @@ function ChartTooltip({ active, payload }: any) {
     );
 }
 
-function UptimeBar({ bars }: { bars: DayBar[] }) {
-    const [hovered, setHovered] = useState<DayBar | null>(null);
-    const [hoverX, setHoverX] = useState(0);
-
-    function barColor(bar: DayBar) {
-        if (!bar.hasData) return 'bg-border';
-        if (bar.uptimePct === 100) return 'bg-emerald-500';
-        if (bar.uptimePct >= 95) return 'bg-amber-500';
-        return 'bg-red-500';
-    }
-
-    return (
-        <div className="relative">
-            <div className="flex items-end gap-px h-8">
-                {bars.map((bar, i) => (
-                    <div
-                        key={i}
-                        className={`flex-1 rounded-sm transition-opacity cursor-default ${barColor(bar)} ${hovered && hovered !== bar ? 'opacity-50' : 'opacity-100'
-                            }`}
-                        style={{ height: bar.hasData ? `${Math.max(30, bar.uptimePct)}%` : '30%' }}
-                        onMouseEnter={(e) => {
-                            setHovered(bar);
-                            setHoverX(e.currentTarget.getBoundingClientRect().left);
-                        }}
-                        onMouseLeave={() => setHovered(null)}
-                    />
-                ))}
-            </div>
-
-            {/* Hover tooltip */}
-            {hovered && (
-                <div
-                    className="absolute bottom-10 bg-card border border-border rounded-lg px-3 py-2 text-xs shadow-xl whitespace-nowrap pointer-events-none z-10"
-                    style={{ left: '50%', transform: 'translateX(-50%)' }}
-                >
-                    <p className="text-foreground font-medium">{hovered.label}</p>
-                    {hovered.hasData ? (
-                        <p className="text-muted-foreground mt-0.5">
-                            {hovered.uptimePct.toFixed(2)}% uptime &middot; {hovered.total} checks
-                        </p>
-                    ) : (
-                        <p className="text-muted-foreground mt-0.5">No data</p>
-                    )}
-                </div>
-            )}
-
-            {/* Legend */}
-            <div className="flex items-center gap-4 mt-2">
-                {[
-                    { color: 'bg-emerald-500', label: '100%' },
-                    { color: 'bg-amber-500', label: '≥ 95%' },
-                    { color: 'bg-red-500', label: '< 95%' },
-                    { color: 'bg-border', label: 'No data' },
-                ].map((item) => (
-                    <div key={item.label} className="flex items-center gap-1.5 text-xs text-muted-foreground">
-                        <div className={`w-2.5 h-2.5 rounded-sm ${item.color}`} />
-                        {item.label}
-                    </div>
-                ))}
-                <span className="ml-auto text-xs text-muted-foreground">90 days</span>
-            </div>
-        </div>
-    );
-}
 
 // ─── Main component ───────────────────────────────────────────────────────────
 
@@ -281,15 +129,26 @@ export default function MonitorPage() {
     const [monitor, setMonitor] = useState<MonitorResponse | null>(null);
     const [loading, setLoading] = useState(false);
 
-    //-------------------------------------------------------------------
+    const [fetchRange, setFetchRange] = useState<TimeRange>('7D');
+    const [range, setRange] = useState<TimeRange>('24H'); //time range for filter
+    const rangeWeight = { "1H": 1, "24H": 2, "7D": 3, "30D": 4 }; //to check which range is big
+    const [allChecks, setAllChecks] = useState<MonitorCheck[]>([]); //all data of the web
+    const [checks, setChecks] = useState<MonitorCheck[]>([]); //data of filtered range
 
-    //****************
-    const [range, setRange] = useState<TimeRange>('24H'); //time range
 
-    
-    const [allChecks, setAllChecks] = useState<MonitorCheck[]>([]); //
+    const upChecks = checks.filter((c) => c.status === 'Up'); //filter from checks data
+    //used in uptime stat box
+    const uptimePct = checks.length > 0 ? ((upChecks.length / checks.length) * 100).toFixed(2) : null;
 
-    const [checks, setChecks] = useState<MonitorCheck[]>([]);
+    const responseTimes = upChecks.map((c) => c.response_time!).filter((r) => r != null); //filtered from upChecks
+    const avgResponse = responseTimes.length //avg statBox
+        ? Math.round(responseTimes.reduce((a, b) => a + b, 0) / responseTimes.length)
+        : null;
+    const minResponse = responseTimes.length ? Math.min(...responseTimes) : null; //fastet statBox
+    const maxResponse = responseTimes.length ? Math.max(...responseTimes) : null; //slowest statBox
+
+    //detect all the failed checks from checks
+    const incidents = useMemo(() => detectIncidents(checks), [checks]);
 
     // Derived stats
     const chartPoints = useMemo(
@@ -298,18 +157,6 @@ export default function MonitorPage() {
     );
 
     const dayBars = useMemo(() => buildDayBars(allChecks), [allChecks]);
-    const incidents = useMemo(() => detectIncidents(checks), [checks]);
-
-    const upChecks = checks.filter((c) => c.status === 'Up');
-    const downChecks = checks.filter((c) => c.status === 'Down');
-    const responseTimes = upChecks.map((c) => c.response_time!).filter((r) => r != null);
-    const avgResponse = responseTimes.length
-        ? Math.round(responseTimes.reduce((a, b) => a + b, 0) / responseTimes.length)
-        : null;
-    const minResponse = responseTimes.length ? Math.min(...responseTimes) : null;
-    const maxResponse = responseTimes.length ? Math.max(...responseTimes) : null;
-    const uptimePct =
-        checks.length > 0 ? ((upChecks.length / checks.length) * 100).toFixed(3) : null;
 
     // Detect down periods for chart reference areas
     const downPeriods = useMemo(() => {
@@ -328,31 +175,27 @@ export default function MonitorPage() {
     }, [chartPoints]);
 
     const xFmt = getXAxisFormat(range);
-    const hasChecks = allChecks.length > 0;
 
-    //-------------------------------------
-    async function fetchWeb() {
+    //----------------------------------
+    async function fetchWeb(t: string) {
         try {
             setLoading(true);
             //return data >= the range
-            const res = await fetchWebsite(websiteId, range);
-            console.log(res);
-            if(res) {
+            const res = await fetchWebsite(websiteId, t);
+            if (res) {
                 setMonitor(res);
             }
 
-            const mappedChecks = (res.ticks || [])
-                .map((t: MonitorTick) => ({
-                    id: t.id,
-                    monitor_id: t.website_id,
-                    status: t.status,
-                    response_time: t.response_time_ms,
-                    error_message: null,
-                    checked_at: t.createdAt
-                }));
+            const mappedChecks = (res?.ticks || []).map((t: any) => ({
+                id: t.id,
+                monitor_id: t.website_id,
+                status: t.status,
+                response_time: t.response_time_ms,
+                error_message: null,
+                checked_at: t.createdAt
+            }));
 
-            setAllChecks(mappedChecks);
-            setChecks(mappedChecks);
+            setAllChecks(mappedChecks); //set all data in allChecks
 
         } catch (error) {
             console.log("Failed to fetch website: ", error);
@@ -362,12 +205,33 @@ export default function MonitorPage() {
     }
 
     useEffect(() => {
-        fetchWeb();
-    }, [websiteId, range])
+        fetchWeb('7D');
+        setFetchRange('7D');
+    }, [websiteId]);
+
+    // Watch for Range Clicks
+    useEffect(() => {
+        const currentWeight = rangeWeight[range as keyof typeof rangeWeight] || 1;
+        const fetchedWeight = rangeWeight[fetchRange as keyof typeof rangeWeight] || 1;
+
+        if (currentWeight > fetchedWeight) {
+            // larger range than we have downloaded
+            fetchWeb(range);
+            setFetchRange(range);
+        } else {
+            // Just filter it locally
+            const hoursMap: Record<string, number> = { '1H': 1, '24H': 24, '7D': 168, '30D': 720 };
+            const hours = hoursMap[range] || 24;
+            const cutoff = Date.now() - hours * 60 * 60 * 1000;
+
+            setChecks(allChecks.filter((c) => new Date(c.checked_at).getTime() >= cutoff));
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [range, allChecks, fetchRange]);
 
     async function refreshMonitor() {
         setRefreshing(true);
-        await fetchWeb();
+        await fetchWeb(fetchRange);
         setRefreshing(false);
     }
 
@@ -466,7 +330,7 @@ export default function MonitorPage() {
                         <AreaChart data={chartPoints} margin={{ top: 4, right: 16, bottom: 0, left: 0 }}>
                             <defs>
                                 <linearGradient id="respGrad" x1="0" y1="0" x2="0" y2="1">
-                                    <stop offset="0%" stopColor="#38bdf8" stopOpacity={0.18} />
+                                    <stop offset="0%" stopColor="#38bdf8" stopOpacity={0.38} />
                                     <stop offset="100%" stopColor="#38bdf8" stopOpacity={0} />
                                 </linearGradient>
                             </defs>
@@ -534,62 +398,7 @@ export default function MonitorPage() {
             </div>
 
             {/* Incidents */}
-            {/*<div className="border border-border rounded-lg bg-card">
-                <div className="px-5 py-4 border-b border-border flex items-center justify-between">
-                    <div>
-                        <p className="text-sm font-medium text-foreground">Incidents</p>
-                        <p className="text-xs text-muted-foreground mt-0.5">Downtime events in {range}</p>
-                    </div>
-                    <span className="text-xs font-mono text-muted-foreground">
-                        {incidents.length} total
-                    </span>
-                </div>
-
-                {incidents.length === 0 ? (
-                    <div className="flex items-center justify-center h-28 text-sm text-muted-foreground gap-2">
-                        <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 inline-block" />
-                        No incidents in this period
-                    </div>
-                ) : (
-                    <Table>
-                        <TableHeader>
-                            <TableRow className="border-border hover:bg-transparent">
-                                <TableHead className="text-muted-foreground font-medium pl-5">Started</TableHead>
-                                <TableHead className="text-muted-foreground font-medium">Recovered</TableHead>
-                                <TableHead className="text-muted-foreground font-medium">Duration</TableHead>
-                                <TableHead className="text-muted-foreground font-medium pr-5">Status</TableHead>
-                            </TableRow>
-                        </TableHeader>
-                        <TableBody>
-                            {incidents.map((inc, i) => (
-                                <TableRow key={i} className="border-border hover:bg-accent/50">
-                                    <TableCell className="pl-5 text-sm text-foreground font-mono py-3">
-                                        {format(inc.start, 'MMM d, HH:mm')}
-                                    </TableCell>
-                                    <TableCell className="text-sm text-muted-foreground font-mono">
-                                        {inc.end ? format(inc.end, 'MMM d, HH:mm') : (
-                                            <span className="text-red-400">Ongoing</span>
-                                        )}
-                                    </TableCell>
-                                    <TableCell className="text-sm font-mono text-muted-foreground">
-                                        {formatDistanceStrict(inc.start, inc.end ?? new Date())}
-                                    </TableCell>
-                                    <TableCell className="pr-5">
-                                        <span
-                                            className={`text-xs font-medium px-2 py-0.5 rounded border ${inc.end
-                                                    ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20'
-                                                    : 'bg-red-500/10 text-red-400 border-red-500/20'
-                                                }`}
-                                        >
-                                            {inc.end ? 'Resolved' : 'Ongoing'}
-                                        </span>
-                                    </TableCell>
-                                </TableRow>
-                            ))}
-                        </TableBody>
-                    </Table>
-                )}
-            </div>*/}
+            <Incidents incidents={incidents} range={range} />
         </PageShell >
     );
 }

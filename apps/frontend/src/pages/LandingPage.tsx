@@ -1,11 +1,11 @@
-import Navbar from '@/components/Navbar';
-import Hero from '@/components/Hero';
-import Features from '@/components/Features';
-import HowItWorks from '@/components/HowItWorks';
-import Pricing from '@/components/Pricing';
-import Testimonials from '@/components/Testimonials';
-import Footer from '@/components/Footer';
-import IntegrationsTicker from '@/components/IntegrationsTicker';
+import Navbar from '@/components/Landing/Navbar';
+import Hero from '@/components/Landing/Hero';
+import Features from '@/components/Landing/Features';
+import HowItWorks from '@/components/Landing/HowItWorks';
+import Pricing from '@/components/Landing/Pricing';
+import Testimonials from '@/components/Landing/Testimonials';
+import Footer from '@/components/Landing/Footer';
+import IntegrationsTicker from '@/components/Landing/IntegrationsTicker';
 
 
 export default function LandingPage() {

@@ -1,5 +1,5 @@
 import { CheckCircle2, XCircle, AlertCircle } from 'lucide-react';
-import { Badge } from './ui/Badge';
+import { Badge } from '../ui/Badge';
 import type { WebsiteStatus } from '@/types/monitor';
 
 interface StatusBadgeProps {

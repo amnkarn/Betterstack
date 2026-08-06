@@ -10,7 +10,7 @@ import {
 } from '@/components/ui/alert-dialog';
 import { Loader2 } from 'lucide-react';
 import { addWebsite } from '@/api/homeApi';
-import { Button } from './ui/Button';
+import { Button } from '../ui/Button';
 
 interface AddMonitorModalProps {
     open: boolean;

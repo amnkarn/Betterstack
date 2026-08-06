@@ -1,4 +1,4 @@
-import { Button } from './ui/Button';
+import { Button } from '../ui/Button';
 import { Activity, ArrowRight } from 'lucide-react';
 import { FaGithub, FaLinkedin, FaTwitter } from "react-icons/fa"
 import { Link } from 'react-router-dom';

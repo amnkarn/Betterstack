@@ -14,7 +14,7 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import StatusBadge from './StatusBadge';
+import StatusBadge from '../MonitorPage/StatusBadge';
 import type { MonitorWebsite } from '@/types/monitor';
 import { Activity, ExternalLink, MoreHorizontal, Trash2 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
